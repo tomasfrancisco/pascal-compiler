@@ -1,0 +1,7 @@
+Era uma vez um numero inteiro, chamava-se Pi. E tinha o valor 3.1416. Ele sentia-ze um pouco sozinho, pois havia muitos números que tinham primos (ou eram primos de alguém). Por exemplo, o 2, o 5, o 7... Claro que não era grave... Ser um número negativo, como -1, -2... ou mesmo -3.1416 era feio! Já há tanto pessimismo por aí. Também era melhor que ser uma letra! Há tão poucas...
+
+Há muito menos letras, mas podemos combiná-las umas com as outras. O Abcededário é a sequência "abcdefghijklmnopqrstuvxyz". Há combinações estranhas (que não são palavras de linguas naturais), como por exemplo abcbcbcbcbc. Mas há delas que correspondem a conceitos! Por exemplo Pássaro, Sol, Vermelho, e muitas outras!
+
+Para terminar, podemos mostrar numeros em C: 123, 12.3, 0.99, 99f, 
+929292912l. E ha os extendidos: 1e+90, 89e-8, 1.23e-12.
+
