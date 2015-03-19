@@ -38,8 +38,8 @@ exponent	"e"[+-]?{digit}+
 "<"|">"|"="|"<>"|"<="|">="						{printf("OP2(%s)\n", yytext);}
 "+"|"-"											{printf("OP3(%s)\n", yytext);}
 "*"|"/"|"mod"|"div"								{printf("OP4(%s)\n", yytext);}
-{letter}+[{digit}|{letter}]*					{printf("ID(%s)\n", yytext);}
-{digit}+(.{digit}+{exponent}?)|({exponent})		{printf("REALLIT\n");}
+{letter}+({digit}|{letter})*					{printf("ID(%s)\n", yytext);}
+{digit}+(("."{digit}+{exponent}?)|({exponent}))	{printf("REALLIT\n");}
 {digit}+										{printf("INTLIT\n");}
 "'"(.|("''"."''"))*"'"							{printf("STRING(%s)\n", yytext);}
 [\t\n\r]										;
