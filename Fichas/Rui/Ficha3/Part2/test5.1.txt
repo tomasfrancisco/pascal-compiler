@@ -1,0 +1,15 @@
+a=1
+b=5
+c=0
+d=9
+e=999
+x=a*d/3
+c=c+1
+y=d^3
+x+y
+a++
+d--
+t=a*(d+5)
+sqrt(a)
+varlist
+save "variables"
