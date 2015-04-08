@@ -26,108 +26,77 @@ extern char *token;
 
 %%
 
-Prog: ProgHeading SEMIC ProgBlock DOT{;}
-
-ProgHeading: PROGRAM ID LBRAC OUTPUT RBRAC {;}
-
-ProgBlock: VarPart FuncPart StatPart {;}
-
-VarPart:   VAR VarDeclaration SEMIC VarPartAux {;}
-            | %empty {;}
-
-VarPartAux: VarDeclaration SEMIC VarPartAux {;}
-             | %empty {;}
-
-VarDeclaration: IDList COLON ID {;}
-
-IDList: ID IDAux {;}
-
-IDAux: COMMA ID IDAux {;}
-        | %empty {;}
-
-FuncPart:  FuncDeclaration SEMIC FuncPart {;}
-            | %empty {;}
-
-FuncDeclaration: FuncHeading SEMIC FORWARD {;}
-
-FuncDeclaration: FuncIdent SEMIC FuncBlock{;}
-
-FuncDeclaration: FuncHeading SEMIC FuncBlock{;}
-
-FuncHeading: FUNCTION ID FormalParamList COLON ID{;}
-              | FUNCTION ID COLON ID{;}
-
-FuncIdent: FUNCTION ID{;}
-
-FormalParamList: LBRAC FormalParams FormalParamListAux RBRAC{;}
-
-FormalParamListAux: SEMIC FormalParams FormalParamListAux{;}
-                    | %empty{;}
-
-FormalParams: VAR IDList COLON ID{;}
-               | IDList COLON ID{;}
-
-
-FuncBlock: VarPart StatPart{;}
-
-StatPart: CompStat{;}
-
-CompStat: BEGINTOKEN StatList END{;}
-
-StatList: Stat StatListAux{;}
-
-StatListAux: SEMIC Stat StatListAux{;}
-              | %empty{;}
-
-Stat: CompStat{;}
-
-    | IF Expr THEN Stat ELSE Stat{;}
-    | IF Expr THEN Stat {;}
-    | WHILE Expr DO Stat{;}
-    | REPEAT StatList UNTIL Expr
-    | VAL LBRAC PARAMSTR LBRAC Expr RBRAC COMMA ID RBRAC{;}
-    | ID ASSIGN Expr{;}
-    | WRITELN WritelnPList{;}
-    | WRITELN{;}
-    | %empty{;}
-
-WritelnPList: LBRAC WritelnPListAux1 WritelnPListAux2 RBRAC{;}
-
-WritelnPListAux1: Expr{;}
-                   | STRING{;}
-
-WritelnPListAux2: COMMA WritelnPListAux1 WritelnPListAux2{;}
-                   | %empty{;}
-
-
-Expr: Expr OR Expr{;}
-     | Expr AND Expr{;}
-     | Expr DIFF Expr{;}
-     | Expr DIV Expr{;}
-     | Expr MOREEQUAL Expr{;}
-     | Expr LESSEQUAL Expr{;}
-     | Expr MOD Expr{;}
-     | Expr '=' Expr{;}
-     | Expr '+' Expr{;}
-     | Expr '-' Expr{;}
-     | Expr '/' Expr{;}
-     | Expr '*' Expr{;}
-     | Expr '<' Expr{;}
-     | Expr '>' Expr{;}
-     | '+' Expr{;}
-     | '-' Expr{;}
-     | NOT Expr{;}
-     | LBRAC Expr RBRAC{;}
-     | INTLIT{;}
-     | REALLIT{;}
-     | ID ParamList{;}
-     | ID{;}
-
-ParamList: LBRAC Expr ParamListAux RBRAC{;}
-
-ParamListAux: COMMA Expr ParamListAux{;}
-              | %empty{;}
-
+Prog                :   ProgHeading SEMIC ProgBlock DOT                     {;}
+ProgHeading         :   PROGRAM ID LBRAC OUTPUT RBRAC                       {;}
+ProgBlock           :   VarPart FuncPart StatPart                           {;}
+VarPart             :   VAR VarDeclaration SEMIC VarPartAux                 {;}
+                    |   %empty                                              {;}
+VarPartAux          :   VarDeclaration SEMIC VarPartAux                     {;}
+                    |   %empty                                              {;}
+VarDeclaration      :   IDList COLON ID                                     {;}
+IDList              :   ID IDAux                                            {;}
+IDAux               :   COMMA ID IDAux                                      {;}
+                    |   %empty                                              {;}
+FuncPart            :   FuncDeclaration SEMIC FuncPart                      {;}
+                    |   %empty                                              {;}
+FuncDeclaration     :   FuncHeading SEMIC FORWARD                           {;}
+FuncDeclaration     :   FuncIdent SEMIC FuncBlock                           {;}
+FuncDeclaration     :   FuncHeading SEMIC FuncBlock                         {;}
+FuncHeading         :   FUNCTION ID FormalParamList COLON ID                {;}
+                    |   FUNCTION ID COLON ID                                {;}
+FuncIdent           :   FUNCTION ID                                         {;}
+FormalParamList     :   LBRAC FormalParams FormalParamListAux RBRAC         {;}
+FormalParamListAux  :   SEMIC FormalParams FormalParamListAux               {;}
+                    |   %empty                                              {;}
+FormalParams        :   VAR IDList COLON ID                                 {;}
+                    |   IDList COLON ID                                     {;}
+FuncBlock           :   VarPart StatPart                                    {;}
+StatPart            :   CompStat                                            {;}
+CompStat            :   BEGINTOKEN StatList END                             {;}
+StatList            :   Stat StatListAux                                    {;}
+StatListAux         :   SEMIC Stat StatListAux                              {;}
+                    |   %empty                                              {;}
+Stat                :   CompStat                                            {;}
+                    |   IF Expr THEN Stat ELSE Stat                         {;}
+                    |   IF Expr THEN Stat                                   {;}
+                    |   WHILE Expr DO Stat                                  {;}
+                    |   REPEAT StatList UNTIL Expr
+                    |   VAL LBRAC PARAMSTR LBRAC Expr RBRAC COMMA ID RBRAC  {;}
+                    |   ID ASSIGN Expr                                      {;}
+                    |   WRITELN WritelnPList                                {;}
+                    |   WRITELN                                             {;}
+                    |   %empty                                              {;}
+WritelnPList        :   LBRAC WritelnPListAux1 WritelnPListAux2 RBRAC       {;}
+WritelnPListAux1    :   Expr                                                {;}
+                    |   STRING                                              {;}
+WritelnPListAux2    :   COMMA WritelnPListAux1 WritelnPListAux2             {;}
+                    |   %empty                                              {;}
+Expr                :   Expr OR Expr                                        {;}
+                    |   Expr AND Expr                                       {;}
+                    |   Expr DIFF Expr                                      {;}
+                    |   Expr DIV Expr                                       {;}
+                    |   Expr MOREEQUAL Expr                                 {;}
+                    |   Expr LESSEQUAL Expr                                 {;}
+                    |   Expr MOD Expr                                       {;}
+                    |   Expr '=' Expr                                       {;}
+                    |   Expr '+' Expr                                       {;}
+                    |   Expr '-' Expr                                       {;}
+                    |   Expr '/' Expr                                       {;}
+                    |   Expr '*' Expr                                       {;}
+                    |   Expr '<' Expr                                       {;}
+                    |   Expr '>' Expr                                       {;}
+                    |   '+' Expr                                            {;}
+                    |   '-' Expr                                            {;}
+                    |   NOT Expr                                            {;}
+                    |   LBRAC Expr RBRAC                                    {;}
+                    |   INTLIT                                              {;}
+                    |   REALLIT                                             {;}
+                    |   ID ParamList                                        {;}
+                    |   ID                                                  {;}
+ParamList           :   LBRAC Expr ParamListAux RBRAC                       {;}
+ParamListAux        :   COMMA Expr ParamListAux                             {;}
+                    |   %empty                                              {;}
+                    
 %%
 
 int yyerror (char *s) {
