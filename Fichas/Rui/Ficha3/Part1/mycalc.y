@@ -4,9 +4,7 @@
 int end=0;
 int error=0;
 %}
-%token NUMBER
-%token END
-
+%token NUMBER END
 
 %left '+' '-'
 %left '*' '/'
@@ -24,7 +22,7 @@ expression:	expression '+' expression   	{$$=$1+$3;}
 	| 	NUMBER				{$$=$1;}
 	|	'-'NUMBER			{$$=-$2;}
 	|  '(' expression ')' 	{$$=$2;}
-	|  	END 				{end=1;}
+	|  	END 				{$$=0;end=1;}
 	;
 
 %%

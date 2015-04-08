@@ -12,7 +12,7 @@ extern int yylval;  /* Para partilhar yylval*/
 [ \t]  		; 			/*Ignorar espaço e tab*/
 
 "end"       {return END;}
-
+ss
 . 	      	return yytext[0];	/*Caso seja qualquer outro */
 				/*caracter (por exemplo um */
 				/*operador), enviar para   */
