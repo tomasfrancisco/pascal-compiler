@@ -9,7 +9,7 @@ exponent	"e"[+-]?{digit}+
 
 	#define YY_USER_ACTION col += yyleng; token = yytext;
 
- 	int line = 1, col = 1;
+ 	int line = 1, col = 0;
 	char * token ="";
 	int start_line_commment = 1, start_column_comment = 1;
 
@@ -23,7 +23,7 @@ exponent	"e"[+-]?{digit}+
 "(*"|"{"										{start_column_comment = col; start_line_commment = line; BEGIN(COMMENT_STATE);}
 <COMMENT_STATE>("*)"|"}")						{BEGIN(0);}
 <COMMENT_STATE>.								{;}
-<COMMENT_STATE>\n 								{line++; col = 1;}
+<COMMENT_STATE>\n 								{line++; col = 0;}
 <COMMENT_STATE><<eof>>							{printf("Line %d, col %d: unterminated comment\n", start_line_commment, start_column_comment); BEGIN(0);}
 
 "abs"|"arctan"|"array"|"case"|"char"|"chr"|"const"|"cos"|"dispose"|"downto"|"eof"|"eoln"|"exp"|"file"|"for"|"get"|"goto"|"in"|"input"|"label"|"ln"|"maxint"|"new"|"nil"|"odd"|"of"|"ord"|"pack"|"packed"|"page"|"pred"|"procedure"|"put"|"read"|"readln"|"record"|"reset"|"rewrite"|"round"|"set"|"sin"|"sqr"|"sqrt"|"succ"|"text"|"to"|"trunc"|"type"|"unpack"|"with"|"write" {printf("RESERVED(%s)\n", yytext);}
