@@ -2,3 +2,8 @@
 
 *.zip
 *.c
+*.h
+*.output
+
+mpascanner
+mpaparser
