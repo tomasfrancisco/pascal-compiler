@@ -7,7 +7,7 @@ exponent	"e"[+-]?{digit}+
 	#include "y.tab.h"
 	#include "string.h"
 
-	#define YY_USER_ACTION col += yyleng;
+	#define YY_USER_ACTION col += yyleng; token = yytext;
 
  	int line = 1, col = 1;
 	char * token ="";
@@ -28,47 +28,47 @@ exponent	"e"[+-]?{digit}+
 
 "abs"|"arctan"|"array"|"case"|"char"|"chr"|"const"|"cos"|"dispose"|"downto"|"eof"|"eoln"|"exp"|"file"|"for"|"get"|"goto"|"in"|"input"|"label"|"ln"|"maxint"|"new"|"nil"|"odd"|"of"|"ord"|"pack"|"packed"|"page"|"pred"|"procedure"|"put"|"read"|"readln"|"record"|"reset"|"rewrite"|"round"|"set"|"sin"|"sqr"|"sqrt"|"succ"|"text"|"to"|"trunc"|"type"|"unpack"|"with"|"write" {printf("RESERVED(%s)\n", yytext);}
 
-":="											{token="ASSIGN";  										return ASSIGN;		}
-"begin"											{token="BEGINTOKEN"; 									return BEGINTOKEN;	}
-":"												{token="COLON"; 			yylval.ch=yytext[0]; 		return COLON;		}
-","												{token="COMMA"; 			yylval.ch=yytext[0];		return COMMA;		}
-"do"											{token="DO"; 											return DO;			}
-"."												{token="DOT"; 			 	yylval.ch=yytext[0];		return DOT;			}
-"else"											{token="ELSE"; 											return ELSE;		}
-"end"											{token="END"; 			 								return END;			}
-"forward"										{token="FORWARD"; 		 								return FORWARD;		}
-"function"										{token="FUNCTION"; 										return FUNCTION;	}
-"if"											{token="IF"; 			 								return IF;			}
-"("												{token="LBRAC"; 		 	yylval.ch=yytext[0];		return LBRAC;		}
-"not"											{token="NOT"; 			 								return NOT; 		}
-"output"										{token="OUTPUT"; 		 								return OUTPUT;		}
-"paramstr"										{token="PARAMSTR"; 										return PARAMSTR;	}
-"program"										{token="PROGRAM"; 		 								return PROGRAM;		}
-")"												{token="RBRAC"; 			yylval.ch=yytext[0]; 		return RBRAC;		}
-"repeat"										{token="REPEAT"; 		 								return REPEAT; 		}
-";"												{token="SEMIC";  		 	yylval.ch=yytext[0];		return SEMIC;		}
-"then"											{token="THEN"; 											return THEN;		}
-"until"											{token="UNTIL"; 										return UNTIL;		}
-"val"											{token="VAL"; 			 								return VAL; 		}
-"var"											{token="VAR"; 			 								return VAR;			}
-"while"											{token="WHILE"; 		 								return WHILE; 		}
-"writeln"										{token="WRITELN"; 		 								return WRITELN; 	}
-"and"											{token="AND";  			 	yylval.str=strdup(yytext);	return AND;			}
-"or"											{token="OR";  			 	yylval.str=strdup(yytext);	return OR;			}
-"<>"											{token="DIFF";  		 	yylval.str=strdup(yytext);	return DIFF;		}
-"<="											{token="LESSEQUAL";  	 	yylval.str=strdup(yytext);	return LESSEQUAL;	}
-">="											{token="MOREEQUAL";  	 	yylval.str=strdup(yytext); 	return MOREEQUAL;	}
-"+"|"-"|"<"|">"|"="|"*"|"/"						{yylval.str=strdup(yytext); yylval.ch=yytext[0]; 		return yytext[0];	}
-"mod"											{token="MOD";  			 	yylval.str=strdup(yytext);	return MOD;			}
-"div"											{token="DIV";				yylval.str=strdup(yytext);	return DIV;			}
-{letter}+({digit}|{letter})*					{token="ID";  			 	yylval.str=strdup(yytext); 	return ID;			}
-{digit}+(("."{digit}+{exponent}?)|({exponent}))	{token="REALLIT"; 		 	yylval.str=strdup(yytext); 	return REALLIT;		}
-'([^'\n]|'')*'									{token="STRING";  		 	yylval.str=strdup(yytext);	return STRING;		}
-{digit}+										{token="INTLIT";  		 	yylval.i=atoi(yytext);		return INTLIT;		}
-'([^'\n]|'')*									{printf("Line %d, col %d: unterminated string\n", line, col); 				}
-\n 												{line++; 					col = 0;										}
-[ \t]											{;																			}
-.												{printf("Line %d, col %d: illegal character ('%c')\n", line, col, yytext[0]);}
+":="											{return ASSIGN;																		}
+"begin"											{																return BEGINTOKEN;	}
+":"												{yylval.ch=yytext[0]; 											return COLON;		}
+","												{yylval.ch=yytext[0];											return COMMA;		}
+"do"											{			 													return DO;			}
+"."												{yylval.ch=yytext[0];											return DOT;			}
+"else"											{			 													return ELSE;		}
+"end"											{			 			 										return END;			}
+"forward"										{				 		 										return FORWARD;		}
+"function"										{				 												return FUNCTION;	}
+"if"											{			 			 										return IF;			}
+"("												{yylval.ch=yytext[0];											return LBRAC;		}
+"not"											{			 			 										return NOT; 		}
+"output"										{				 		 										return OUTPUT;		}
+"paramstr"										{				 												return PARAMSTR;	}
+"program"										{				 		 										return PROGRAM;		}
+")"												{yylval.ch=yytext[0]; 											return RBRAC;		}
+"repeat"										{				 		 										return REPEAT; 		}
+";"												{yylval.ch=yytext[0];											return SEMIC;		}
+"then"											{			 													return THEN;		}
+"until"											{				 												return UNTIL;		}
+"val"											{			 			 										return VAL; 		}
+"var"											{			 			 										return VAR;			}
+"while"											{				 		 										return WHILE; 		}
+"writeln"										{				 		 										return WRITELN; 	}
+"and"											{yylval.str=strdup(yytext);										return AND;			}
+"or"											{yylval.str=strdup(yytext);										return OR;			}
+"<>"											{yylval.str=strdup(yytext);										return DIFF;		}
+"<="											{yylval.str=strdup(yytext);										return LESSEQUAL;	}
+">="											{yylval.str=strdup(yytext); 									return MOREEQUAL;	}
+"+"|"-"|"<"|">"|"="|"*"|"/"						{yylval.str=strdup(yytext); 	yylval.ch=yytext[0]; 			return yytext[0];	}
+"mod"											{yylval.str=strdup(yytext);										return MOD;			}
+"div"											{yylval.str=strdup(yytext);										return DIV;			}
+{letter}+({digit}|{letter})*					{yylval.str=strdup(yytext); 									return ID;			}
+{digit}+(("."{digit}+{exponent}?)|({exponent}))	{yylval.str=strdup(yytext); 									return REALLIT;		}
+'([^'\n]|'')*'									{yylval.str=strdup(yytext);										return STRING;		}
+{digit}+										{yylval.i=atoi(yytext);											return INTLIT;		}
+'([^'\n]|'')*									{printf("Line %d, col %d: unterminated string\n", line, col); 						}
+\n 												{line++; 					col = 0;												}
+[ \t]											{;																					}
+.												{printf("Line %d, col %d: illegal character ('%c')\n", line, col, yytext[0]);		}
 %%
 
 int yywrap() {

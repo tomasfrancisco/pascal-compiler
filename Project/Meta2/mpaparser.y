@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 extern int line, col;
 extern char *token;
@@ -103,7 +104,7 @@ ParamListAux        :   COMMA Expr ParamListAux                             {;}
 
 void yyerror (char *s) {
 
-    printf ("Line %d, col %d: %s: %s\n", line, col, s, token);
+    printf ("Line %d, col %d: %s: %s\n", line, col - (int) (strlen(token) - 1) , s, token);
 }
 int main()
 {
