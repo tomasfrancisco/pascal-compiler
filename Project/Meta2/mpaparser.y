@@ -5,6 +5,8 @@
 
 extern int line, col;
 extern char *token;
+int yylex();
+void yyerror(char *s);
 %}
 
 %union{
@@ -30,15 +32,15 @@ Prog                :   ProgHeading SEMIC ProgBlock DOT                     {;}
 ProgHeading         :   PROGRAM ID LBRAC OUTPUT RBRAC                       {;}
 ProgBlock           :   VarPart FuncPart StatPart                           {;}
 VarPart             :   VAR VarDeclaration SEMIC VarPartAux                 {;}
-                    |   %empty                                              {;}
+                    |   /*%empty*/                                          {;}
 VarPartAux          :   VarDeclaration SEMIC VarPartAux                     {;}
-                    |   %empty                                              {;}
+                    |   /*%empty*/                                          {;}
 VarDeclaration      :   IDList COLON ID                                     {;}
 IDList              :   ID IDAux                                            {;}
 IDAux               :   COMMA ID IDAux                                      {;}
-                    |   %empty                                              {;}
+                    |   /*%empty*/                                          {;}
 FuncPart            :   FuncDeclaration SEMIC FuncPart                      {;}
-                    |   %empty                                              {;}
+                    |   /*%empty*/                                          {;}
 FuncDeclaration     :   FuncHeading SEMIC FORWARD                           {;}
 FuncDeclaration     :   FuncIdent SEMIC FuncBlock                           {;}
 FuncDeclaration     :   FuncHeading SEMIC FuncBlock                         {;}
@@ -47,7 +49,7 @@ FuncHeading         :   FUNCTION ID FormalParamList COLON ID                {;}
 FuncIdent           :   FUNCTION ID                                         {;}
 FormalParamList     :   LBRAC FormalParams FormalParamListAux RBRAC         {;}
 FormalParamListAux  :   SEMIC FormalParams FormalParamListAux               {;}
-                    |   %empty                                              {;}
+                    |   /*%empty*/                                          {;}
 FormalParams        :   VAR IDList COLON ID                                 {;}
                     |   IDList COLON ID                                     {;}
 FuncBlock           :   VarPart StatPart                                    {;}
@@ -55,22 +57,22 @@ StatPart            :   CompStat                                            {;}
 CompStat            :   BEGINTOKEN StatList END                             {;}
 StatList            :   Stat StatListAux                                    {;}
 StatListAux         :   SEMIC Stat StatListAux                              {;}
-                    |   %empty                                              {;}
+                    |   /*%empty*/                                          {;}
 Stat                :   CompStat                                            {;}
                     |   IF Expr THEN Stat ELSE Stat                         {;}
                     |   IF Expr THEN Stat                                   {;}
                     |   WHILE Expr DO Stat                                  {;}
-                    |   REPEAT StatList UNTIL Expr
+                    |   REPEAT StatList UNTIL Expr                          {;}
                     |   VAL LBRAC PARAMSTR LBRAC Expr RBRAC COMMA ID RBRAC  {;}
                     |   ID ASSIGN Expr                                      {;}
                     |   WRITELN WritelnPList                                {;}
                     |   WRITELN                                             {;}
-                    |   %empty                                              {;}
+                    |   /*%empty*/                                          {;}
 WritelnPList        :   LBRAC WritelnPListAux1 WritelnPListAux2 RBRAC       {;}
 WritelnPListAux1    :   Expr                                                {;}
                     |   STRING                                              {;}
 WritelnPListAux2    :   COMMA WritelnPListAux1 WritelnPListAux2             {;}
-                    |   %empty                                              {;}
+                    |   /*%empty*/                                          {;}
 Expr                :   Expr OR Expr                                        {;}
                     |   Expr AND Expr                                       {;}
                     |   Expr DIFF Expr                                      {;}
@@ -95,16 +97,17 @@ Expr                :   Expr OR Expr                                        {;}
                     |   ID                                                  {;}
 ParamList           :   LBRAC Expr ParamListAux RBRAC                       {;}
 ParamListAux        :   COMMA Expr ParamListAux                             {;}
-                    |   %empty                                              {;}
+                    |   /*%empty*/                                          {;}
                     
 %%
 
-int yyerror (char *s) {
+void yyerror (char *s) {
 
-    printf ("Line %d, col %d: %s: %s\n", line,col, s, token);
+    printf ("Line %d, col %d: %s: %s\n", line, col, s, token);
 }
 int main()
 {
     yyparse();
-    printf("What");
+    //printf("Terminating process...");
+    return 0;
 }
