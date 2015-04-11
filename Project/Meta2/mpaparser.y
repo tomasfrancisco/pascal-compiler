@@ -5,7 +5,8 @@
 #include <string.h>
 
 extern int line, col;
-extern char *token;
+extern char *yytext;
+extern int yyleng;
 int yylex();
 void yyerror(char *s);
 %}
@@ -99,12 +100,12 @@ Expr                :   Expr OR Expr                                        {;}
 ParamList           :   LBRAC Expr ParamListAux RBRAC                       {;}
 ParamListAux        :   COMMA Expr ParamListAux                             {;}
                     |   /*%empty*/                                          {;}
-                    
+                        
 %%
 
 void yyerror (char *s) {
-
-    printf ("Line %d, col %d: %s: %s\n", line, col - (int) (strlen(token) - 1) , s, token);
+    //printf("line: %d, col: %d, len: %d, token: %s\n", line, col, yyleng, yytext);
+    printf("Line %d, col %d: %s: %s\n", line, col - ((int)strlen(yytext) - 1), s, yytext);
 }
 int main()
 {

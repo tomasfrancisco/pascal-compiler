@@ -7,11 +7,11 @@ exponent	"e"[+-]?{digit}+
 	#include "y.tab.h"
 	#include "string.h"
 
-	#define YY_USER_ACTION col += yyleng; token = yytext;
+	#define YY_USER_ACTION col += yyleng;
 
  	int line = 1, col = 0;
 	char * token ="";
-	int start_line_commment = 1, start_column_comment = 1;
+	int start_line_commment = 0, start_column_comment = 0;
 
 %}
 %option case-insensitive
@@ -21,10 +21,10 @@ exponent	"e"[+-]?{digit}+
 %%
 
 "(*"|"{"										{start_column_comment = col; start_line_commment = line; BEGIN(COMMENT_STATE);}
-<COMMENT_STATE>("*)"|"}")						{BEGIN(0);}
+<COMMENT_STATE>"*)"|"}"							{BEGIN(INITIAL); start_line_commment = 0; start_column_comment = 0;}
 <COMMENT_STATE>.								{;}
 <COMMENT_STATE>\n 								{line++; col = 0;}
-<COMMENT_STATE><<eof>>							{printf("Line %d, col %d: unterminated comment\n", start_line_commment, start_column_comment); BEGIN(0);}
+<COMMENT_STATE><<eof>>							{printf("Line %d, col %d: unterminated comment\n", start_line_commment, start_column_comment); BEGIN(INITIAL); start_column_comment = 0; start_line_commment = 0;}
 
 "abs"|"arctan"|"array"|"case"|"char"|"chr"|"const"|"cos"|"dispose"|"downto"|"eof"|"eoln"|"exp"|"file"|"for"|"get"|"goto"|"in"|"input"|"label"|"ln"|"maxint"|"new"|"nil"|"odd"|"of"|"ord"|"pack"|"packed"|"page"|"pred"|"procedure"|"put"|"read"|"readln"|"record"|"reset"|"rewrite"|"round"|"set"|"sin"|"sqr"|"sqrt"|"succ"|"text"|"to"|"trunc"|"type"|"unpack"|"with"|"write" {printf("RESERVED(%s)\n", yytext);}
 
@@ -65,7 +65,7 @@ exponent	"e"[+-]?{digit}+
 {digit}+(("."{digit}+{exponent}?)|({exponent}))	{yylval.str=strdup(yytext); 									return REALLIT;		}
 '([^'\n]|'')*'									{yylval.str=strdup(yytext);										return STRING;		}
 {digit}+										{yylval.i=atoi(yytext);											return INTLIT;		}
-'([^'\n]|'')*									{printf("Line %d, col %d: unterminated string\n", line, col); 						}
+'([^'\n]|'')*									{printf("Line %d, col %d: unterminated string\n", line, col - ((int)yyleng - 1)); 						}
 \n 												{line++; 					col = 0;												}
 [ \t]											{;																					}
 .												{printf("Line %d, col %d: illegal character ('%c')\n", line, col, yytext[0]);		}
