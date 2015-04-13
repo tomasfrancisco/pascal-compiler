@@ -1,7 +1,8 @@
-typedef struct ast_node *ast_struct;
+typedef struct ast_node *ast_nodeptr;
 
 typedef struct ast_node {
-	char *data;
-	ast_struct children;
-	int num_children;
+	char *type;
+	int nr_children;
+	int superfluo;
+	ast_node ** children;
 } ast_node;

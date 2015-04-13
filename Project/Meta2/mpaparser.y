@@ -1,14 +1,79 @@
 %{
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <stdarg.h>
 
-extern int line, col;
-extern char *yytext;
-extern int yyleng;
-int yylex();
-void yyerror(char *s);
+    extern int line, col;
+    extern char *yytext;
+    extern int yyleng;
+    int yylex();
+    void yyerror(char *s);
+
+
+    typedef struct ast_node {
+        char *type;
+        int nr_children;
+        int superfluo;
+        struct ast_node ** children;
+    } ast_node;
+
+    typedef struct ast_node *ast_nodeptr;
+
+    ast_nodeptr createNode(char *type, int superfluo, int nr_children, ...){
+        va_list valist;
+
+        if(nr_children==0){
+            ast_nodeptr node = (ast_nodeptr) malloc(sizeof(ast_node));
+            node->type= strdup(type); //duplicar yylval senão dá merda
+            node->nr_children=0;
+            node->superfluo=0;
+            return node;
+        }else{
+            ast_nodeptr node = (ast_nodeptr) malloc(sizeof(ast_node));
+            node->type= strdup(type); //duplicar yylval senão dá merda
+            node->nr_children=nr_children;
+            node->superfluo=superfluo;
+            node->children= (ast_nodeptr*) malloc(nr_children*sizeof(ast_node));
+
+            int i,j,indice=0;
+            ast_nodeptr temp;
+
+            va_start(valist , nr_children);
+            for (i=0;i<nr_children; i++){
+
+                temp= va_arg(valist,ast_nodeptr);
+                if(temp->superfluo){
+                    node->nr_children+= temp->nr_children;
+                    node->children = (ast_nodeptr*) realloc (node->children,node->nr_children*sizeof(ast_node));
+                    for(j=0;j<temp->nr_children;j++){
+                        node->children[indice]=temp->children[j];
+                        indice++;
+                    }
+                    //Pode-se fazer aqui um free, mas não nos pagam para isso, por isso fuck it
+                }else{
+                    node->children[indice]=temp;
+                    indice++;
+                }
+
+            }
+            va_end(valist);
+            return node;
+        }
+        /*
+        -criar node (se nr_children == 0, criar no terminal (ignorar os passos abaixo))
+        -MALLOC de array de nodes com nr_children
+        -percorrer cada child e ver se é no superfluo:
+        se sim: reallocar o array, não colocar esse nó no array, mas colocar os filhos
+        se não: colocar logo no array
+
+        é importante fazer isto por ordem pois para imprimir tem de estar ordenado ou seja se houverem 3 args
+        e arg1 tiver 3 filhos e for superfluo a imprimir fica:
+        filho1 filho2 filho3 arg2 arg3
+        -devolver node*/
+
+    }
 %}
 
 %union{
