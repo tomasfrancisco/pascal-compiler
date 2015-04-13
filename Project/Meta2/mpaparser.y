@@ -100,7 +100,7 @@ Expr                :   Expr OR Expr                                        {;}
 ParamList           :   LBRAC Expr ParamListAux RBRAC                       {;}
 ParamListAux        :   COMMA Expr ParamListAux                             {;}
                     |   /*%empty*/                                          {;}
-                        
+
 %%
 
 void yyerror (char *s) {

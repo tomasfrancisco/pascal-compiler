@@ -26,41 +26,41 @@ exponent	"e"[+-]?{digit}+
 <COMMENT_STATE>\n 								{line++; col = 0;}
 <COMMENT_STATE><<eof>>							{printf("Line %d, col %d: unterminated comment\n", start_line_commment, start_column_comment); BEGIN(INITIAL); start_column_comment = 0; start_line_commment = 0;}
 
-"abs"|"arctan"|"array"|"case"|"char"|"chr"|"const"|"cos"|"dispose"|"downto"|"eof"|"eoln"|"exp"|"file"|"for"|"get"|"goto"|"in"|"input"|"label"|"ln"|"maxint"|"new"|"nil"|"odd"|"of"|"ord"|"pack"|"packed"|"page"|"pred"|"procedure"|"put"|"read"|"readln"|"record"|"reset"|"rewrite"|"round"|"set"|"sin"|"sqr"|"sqrt"|"succ"|"text"|"to"|"trunc"|"type"|"unpack"|"with"|"write" {printf("RESERVED(%s)\n", yytext);}
+"abs"|"arctan"|"array"|"case"|"char"|"chr"|"const"|"cos"|"dispose"|"downto"|"eof"|"eoln"|"exp"|"file"|"for"|"get"|"goto"|"in"|"input"|"label"|"ln"|"maxint"|"new"|"nil"|"odd"|"of"|"ord"|"pack"|"packed"|"page"|"pred"|"procedure"|"put"|"read"|"readln"|"record"|"reset"|"rewrite"|"round"|"set"|"sin"|"sqr"|"sqrt"|"succ"|"text"|"to"|"trunc"|"type"|"unpack"|"with"|"write" {return RESERVED;}
 
-":="											{return ASSIGN;																		}
+":="											{																return ASSIGN;		}
 "begin"											{																return BEGINTOKEN;	}
-":"												{yylval.ch=yytext[0]; 											return COLON;		}
-","												{yylval.ch=yytext[0];											return COMMA;		}
+":"												{			 		 											return COLON;		}
+","												{			 													return COMMA;		}
 "do"											{			 													return DO;			}
-"."												{yylval.ch=yytext[0];											return DOT;			}
+"."												{			 													return DOT;			}
 "else"											{			 													return ELSE;		}
 "end"											{			 			 										return END;			}
 "forward"										{				 		 										return FORWARD;		}
 "function"										{				 												return FUNCTION;	}
 "if"											{			 			 										return IF;			}
-"("												{yylval.ch=yytext[0];											return LBRAC;		}
+"("												{			 													return LBRAC;		}
 "not"											{			 			 										return NOT; 		}
 "output"										{				 		 										return OUTPUT;		}
 "paramstr"										{				 												return PARAMSTR;	}
 "program"										{				 		 										return PROGRAM;		}
-")"												{yylval.ch=yytext[0]; 											return RBRAC;		}
+")"												{					 											return RBRAC;		}
 "repeat"										{				 		 										return REPEAT; 		}
-";"												{yylval.ch=yytext[0];											return SEMIC;		}
+";"												{																return SEMIC;		}
 "then"											{			 													return THEN;		}
 "until"											{				 												return UNTIL;		}
 "val"											{			 			 										return VAL; 		}
 "var"											{			 			 										return VAR;			}
 "while"											{				 		 										return WHILE; 		}
 "writeln"										{				 		 										return WRITELN; 	}
-"and"											{yylval.str=strdup(yytext);										return AND;			}
-"or"											{yylval.str=strdup(yytext);										return OR;			}
-"<>"											{yylval.str=strdup(yytext);										return DIFF;		}
-"<="											{yylval.str=strdup(yytext);										return LESSEQUAL;	}
-">="											{yylval.str=strdup(yytext); 									return MOREEQUAL;	}
-"+"|"-"|"<"|">"|"="|"*"|"/"						{yylval.str=strdup(yytext); 	yylval.ch=yytext[0]; 			return yytext[0];	}
-"mod"											{yylval.str=strdup(yytext);										return MOD;			}
-"div"											{yylval.str=strdup(yytext);										return DIV;			}
+"and"											{																return AND;			}
+"or"											{																return OR;			}
+"<>"											{																return DIFF;		}
+"<="											{																return LESSEQUAL;	}
+">="											{							 									return MOREEQUAL;	}
+"+"|"-"|"<"|">"|"="|"*"|"/"						{													 			return yytext[0];	}
+"mod"											{																return MOD;			}
+"div"											{																return DIV;			}
 {letter}+({digit}|{letter})*					{yylval.str=strdup(yytext); 									return ID;			}
 {digit}+(("."{digit}+{exponent}?)|({exponent}))	{yylval.str=strdup(yytext); 									return REALLIT;		}
 '([^'\n]|'')*'									{yylval.str=strdup(yytext);										return STRING;		}
