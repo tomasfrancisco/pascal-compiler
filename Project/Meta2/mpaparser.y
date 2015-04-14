@@ -11,7 +11,6 @@
     int yylex();
     void yyerror(char *s);
 
-
     typedef struct ast_node {
         char *type;
         char *value;
@@ -47,21 +46,25 @@
 
             va_start(valist , nr_children);
             for (i=0;i<nr_children; i++){
-
-                temp= va_arg(valist,ast_nodeptr);
-                if(temp->superfluo){
-                    node->nr_children+= temp->nr_children;
-                    node->children = (ast_nodeptr*) realloc (node->children,node->nr_children*sizeof(ast_node));
-                    for(j=0;j<temp->nr_children;j++){
-                        node->children[indice]=temp->children[j];
+                if(temp!=NULL){
+                    temp= va_arg(valist,ast_nodeptr);
+                    if(temp->superfluo){
+                        node->nr_children+= temp->nr_children;
+                        node->children = (ast_nodeptr*) realloc (node->children,node->nr_children*sizeof(ast_node));
+                        for(j=0;j<temp->nr_children;j++){
+                            node->children[indice]=temp->children[j];
+                            indice++;
+                        }
+                        //Pode-se fazer aqui um free, mas não nos pagam para isso, por isso fuck it
+                    }else{
+                        node->children[indice]=temp;
                         indice++;
                     }
-                    //Pode-se fazer aqui um free, mas não nos pagam para isso, por isso fuck it
                 }else{
-                    node->children[indice]=temp;
-                    indice++;
+                    node->nr_children--;
+                    //Caso em que se recebe um nó a NULL como argumento(no caso da regra puder devolver empty)
+                    //Decrementa-se o nr de children para depois bater certo
                 }
-
             }
             va_end(valist);
             return node;
@@ -97,16 +100,20 @@
     }
 %}
 
+
 %union{
     char ch;
     int i;
     char* str;
+    void * ptr;
 }
 
 %token PROGRAM OUTPUT VAR FUNCTION BEGINTOKEN IF THEN ELSE WHILE DO REPEAT UNTIL PARAMSTR NOT RESERVED ASSIGN END VAL FORWARD WRITELN AND OR MOD DIV DIFF MOREEQUAL LESSEQUAL
 %token <ch> SEMIC COLON DOT LBRAC RBRAC COMMA
 %token <str> ID STRING REALLIT
 %token <i> INTLIT
+
+%type <ptr> Id Prog ProgHeading ProgBlock VarPart VarPartAux VarDeclaration IDList IDAux FuncPart FuncDeclaration FuncHeading FuncIdent FormalParamList FormalParamListAux FormalParams FuncBlock StatPart CompStat StatList StatListAux Stat WritelnPList WritelnPListAux1 WritelnPListAux2 Expr ParamList ParamListAux
 
 %right ELSE THEN
 %left '=' DIFF '<' LESSEQUAL '>' MOREEQUAL
@@ -116,30 +123,30 @@
 
 %%
 
-Prog                :   ProgHeading SEMIC ProgBlock DOT                     {;}
-ProgHeading         :   PROGRAM ID LBRAC OUTPUT RBRAC                       {;}
-ProgBlock           :   VarPart FuncPart StatPart                           {;}
-VarPart             :   VAR VarDeclaration SEMIC VarPartAux                 {;}
-                    |   /*%empty*/                                          {;}
-VarPartAux          :   VarDeclaration SEMIC VarPartAux                     {;}
-                    |   /*%empty*/                                          {;}
-VarDeclaration      :   IDList COLON ID                                     {;}
-IDList              :   ID IDAux                                            {;}
-IDAux               :   COMMA ID IDAux                                      {;}
-                    |   /*%empty*/                                          {;}
-FuncPart            :   FuncDeclaration SEMIC FuncPart                      {;}
-                    |   /*%empty*/                                          {;}
-FuncDeclaration     :   FuncHeading SEMIC FORWARD                           {;}
-FuncDeclaration     :   FuncIdent SEMIC FuncBlock                           {;}
-FuncDeclaration     :   FuncHeading SEMIC FuncBlock                         {;}
-FuncHeading         :   FUNCTION ID FormalParamList COLON ID                {;}
-                    |   FUNCTION ID COLON ID                                {;}
-FuncIdent           :   FUNCTION ID                                         {;}
-FormalParamList     :   LBRAC FormalParams FormalParamListAux RBRAC         {;}
+Prog                :   ProgHeading SEMIC ProgBlock DOT                     {rootptr=createNode("Program",NULL,0,2,$1,$3);}
+ProgHeading         :   PROGRAM Id LBRAC OUTPUT RBRAC                       {$$=createNode("ProgHeading",NULL,1,1,$2);}
+ProgBlock           :   VarPart FuncPart StatPart                           {$$=createNode("ProgBlock",NULL,1,3,$1,$2,$3);}
+VarPart             :   VAR VarDeclaration SEMIC VarPartAux                 {$$=createNode("VarPart",NULL,0,2,$2,$4);}
+                    |   /*%empty*/                                          {$$=NULL;}
+VarPartAux          :   VarDeclaration SEMIC VarPartAux                     {$$=createNode("VarPartAux",NULL,1,2,$1,$3);}
+                    |   /*%empty*/                                          {$$=NULL;}
+VarDeclaration      :   IDList COLON Id                                     {$$=createNode("VarDeclaration",NULL,0,2,$1,$3);}
+IDList              :   Id IDAux                                            {$$=createNode("IdList",NULL,1,2,$1,$2);}
+IDAux               :   COMMA Id IDAux                                      {$$=createNode("IDAux",NULL,1,2,$2,$3);}
+                    |   /*%empty*/                                          {$$=NULL;}
+FuncPart            :   FuncDeclaration SEMIC FuncPart                      {$$=createNode("FuncPart",NULL,0,2,$1,$3);}
+                    |   /*%empty*/                                          {$$=NULL;}
+FuncDeclaration     :   FuncHeading SEMIC FORWARD                           {$$=createNode("FuncDecl",NULL,0,1,$1);}
+                    |   FuncIdent SEMIC FuncBlock                           {$$=createNode("FuncDef2",NULL,0,2,$1,$3);}
+                    |   FuncHeading SEMIC FuncBlock                         {$$=createNode("FuncDef",NULL,0,2,$1,$3);}
+FuncHeading         :   FUNCTION Id FormalParamList COLON Id                {;}
+                    |   FUNCTION Id COLON Id                                {;}
+FuncIdent           :   FUNCTION Id                                         {;}
+FormalParamList     :   LBRAC FormalParams FormalParamListAux RBRAC         {$$=createNode("FuncParams",NULL,0,2,$2,$3);}
 FormalParamListAux  :   SEMIC FormalParams FormalParamListAux               {;}
                     |   /*%empty*/                                          {;}
-FormalParams        :   VAR IDList COLON ID                                 {;}
-                    |   IDList COLON ID                                     {;}
+FormalParams        :   VAR IDList COLON Id                                 {$$=createNode("VarParams",NULL,0,2,$2,$4);}
+                    |   IDList COLON Id                                     {$$=createNode("Params",NULL,0,2,$1,$3);}
 FuncBlock           :   VarPart StatPart                                    {;}
 StatPart            :   CompStat                                            {;}
 CompStat            :   BEGINTOKEN StatList END                             {;}
@@ -151,8 +158,8 @@ Stat                :   CompStat                                            {;}
                     |   IF Expr THEN Stat                                   {;}
                     |   WHILE Expr DO Stat                                  {;}
                     |   REPEAT StatList UNTIL Expr                          {;}
-                    |   VAL LBRAC PARAMSTR LBRAC Expr RBRAC COMMA ID RBRAC  {;}
-                    |   ID ASSIGN Expr                                      {;}
+                    |   VAL LBRAC PARAMSTR LBRAC Expr RBRAC COMMA Id RBRAC  {;}
+                    |   Id ASSIGN Expr                                      {;}
                     |   WRITELN WritelnPList                                {;}
                     |   WRITELN                                             {;}
                     |   /*%empty*/                                          {;}
@@ -181,11 +188,14 @@ Expr                :   Expr OR Expr                                        {;}
                     |   LBRAC Expr RBRAC                                    {;}
                     |   INTLIT                                              {;}
                     |   REALLIT                                             {;}
-                    |   ID ParamList                                        {;}
-                    |   ID                                                  {;}
+                    |   Id ParamList                                        {;}
+                    |   Id                                                  {;}
 ParamList           :   LBRAC Expr ParamListAux RBRAC                       {;}
 ParamListAux        :   COMMA Expr ParamListAux                             {;}
                     |   /*%empty*/                                          {;}
+
+//regra auxiliar para criar nó com ID
+Id                  :   ID                                                  {$$=createNode("Id",$1,0,0);}
 
 %%
 
