@@ -14,6 +14,7 @@
 
     typedef struct ast_node {
         char *type;
+        char *value;
         int nr_children;
         int superfluo;
         struct ast_node ** children;
@@ -21,18 +22,22 @@
 
     typedef struct ast_node *ast_nodeptr;
 
-    ast_nodeptr createNode(char *type, int superfluo, int nr_children, ...){
+    ast_nodeptr rootptr;
+
+    ast_nodeptr createNode(char *type, char *value ,int superfluo, int nr_children, ...){
         va_list valist;
 
         if(nr_children==0){
             ast_nodeptr node = (ast_nodeptr) malloc(sizeof(ast_node));
             node->type= strdup(type); //duplicar yylval senão dá merda
+            node->value= strdup(value); //duplicar yylval senão dá merda
             node->nr_children=0;
             node->superfluo=0;
             return node;
         }else{
             ast_nodeptr node = (ast_nodeptr) malloc(sizeof(ast_node));
             node->type= strdup(type); //duplicar yylval senão dá merda
+            node->value= strdup(value); //duplicar yylval senão dá merda
             node->nr_children=nr_children;
             node->superfluo=superfluo;
             node->children= (ast_nodeptr*) malloc(nr_children*sizeof(ast_node));
@@ -73,6 +78,22 @@
         filho1 filho2 filho3 arg2 arg3
         -devolver node*/
 
+    }
+
+    int printTree(ast_nodeptr node,int treedepth){
+        int i;
+        for(i=0;i<treedepth;i++){
+            printf("..");
+        }
+        printf("%s",node->type);
+        if(node->value!=NULL){
+            printf("(%s)",node->value);
+        }
+        printf("\n");
+        for(i=0;i<node->nr_children;i++){
+            printTree(node->children[i],treedepth+1);
+        }
+        return 0;
     }
 %}
 
