@@ -27,10 +27,12 @@
     ast_nodeptr createNode(char *type, char *value ,int superfluo, int nr_children, ...){
         va_list valist;
 
-        if(nr_children==0){
+        if(nr_children==0){ //se tem 0 ou é terminal ou é uma exceção que é impressa na mesma, mesmo que não tenha filhos
+                            //ver enunciado as partes que têm (>=0), tipo funcpart e assim. Daí na gramática criar nós para isso
+                            //em alguns casos %empty
             ast_nodeptr node = (ast_nodeptr) malloc(sizeof(ast_node));
             node->type= strdup(type); //duplicar yylval senão dá merda
-            if(value!=NULL){
+            if(value!=NULL){ //Nós tais nós excessão isto era passado a null, logo crashava por ser tentado fazer dup (o tal problema que estragava a submissao no B)
                 node->value= strdup(value); //duplicar yylval senão dá merda
             }
             node->nr_children=0;
@@ -42,16 +44,18 @@
             node->value= value; //duplicar yylval senão dá merda
             node->nr_children=nr_children;
             node->superfluo=superfluo;
-            node->children= (ast_nodeptr*) malloc(nr_children*sizeof(ast_nodeptr));
-            int i,j,indice=0;
+            node->children= (ast_nodeptr*) malloc(nr_children*sizeof(ast_nodeptr)); //Array de filhos
+            int i,j,indice=0; //Este indice é usado para manter a posição no array de filhos do nó a criar. Pk com os reallocs vamos estar a aumentar o nr de filhos e temos de manter um indice independente do indice original de filhos a percorrer
             ast_nodeptr temp;
 
-            va_start(valist , nr_children);
+            va_start(valist , nr_children); //Percorrer os nós filhos passados como argumentos
             for (i=0;i<nr_children; i++){
                 temp= va_arg(valist,ast_nodeptr);
-                if(temp!=NULL){
-                    if(temp->superfluo){
-                        node->nr_children+=(temp->nr_children-1);
+                if(temp!=NULL){ //Em alguns casos, alguns argumentos são passados como NULL, tipo nos empty, pois não era preciso criar nó
+                                //Quando isto acontece, decrementa-se o nr de filhos do nó que estamos a criar
+                                //Isto poderia ser verificado antes de chamar a função criarNode e chamá-la com menos argumentos mas assim é mais fácil
+                    if(temp->superfluo){ //se o nó filho que estamos a analisar for superfluo, copiamos os filhos desse nó para o nó que estamos a criar
+                        node->nr_children+=(temp->nr_children-1);//-1 pk já está a contar com o nó superfluo que é um filho e vai ser descartado
                         //printf("Incrementing nr_children of %s to %d\n",node->type,node->nr_children);
                         node->children = (ast_nodeptr*) realloc (node->children,node->nr_children*sizeof(ast_nodeptr));
                         for(j=0;j<temp->nr_children;j++){
@@ -117,7 +121,9 @@
     char ch;
     int i;
     char* str;
-    void * ptr;
+    void * ptr; //Void pointer para se puder passar nós pela stack (é um atrofio enorme com regras do yacc,
+                //não perguntes, não vale a pena, basicamente todos os tipos de coisas que queiras passar, tens de declarar aqui)
+                //mas devido a outro retardamento do yacc e lex, não pode ser ast_nodeptr pk y+l declaram union antes de declarar structs por isso não era reconhecido, granda atrofio)
 }
 
 %token PROGRAM OUTPUT VAR FUNCTION BEGINTOKEN IF THEN ELSE WHILE DO REPEAT UNTIL PARAMSTR NOT RESERVED ASSIGN END VAL FORWARD WRITELN AND OR MOD DIV DIFF MOREEQUAL LESSEQUAL
