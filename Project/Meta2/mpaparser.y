@@ -8,6 +8,7 @@
     extern int line, col;
     extern char *yytext;
     extern int yyleng;
+    int errors = 0;
 
     int yylex();
     void yyerror(char *s);
@@ -249,13 +250,14 @@ Id                  :   ID                                                  {$$=
 %%
 
 void yyerror (char *s) {
-    //printf("line: %d, col: %d, len: %d, token: %s\n", line, col, yyleng, yytext);
+    errors = 1;
     printf("Line %d, col %d: %s: %s\n", line, col - ((int)strlen(yytext) - 1), s, yytext);
 }
-int main()
+int main(int argc, char **argv)
 {
     yyparse();
-    printTree(rootptr,0);
-    //printf("Terminating process...");
+    if(argc > 1 && strcmp(argv[1], "-t") == 0 && errors == 0) {
+       printTree(rootptr,0); 
+    }
     return 0;
 }
