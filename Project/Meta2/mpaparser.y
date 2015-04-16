@@ -143,7 +143,7 @@
 
 Prog                :   ProgHeading SEMIC ProgBlock DOT                     {rootptr=createNode("Program",NULL,0,2,$1,$3);}
 ProgHeading         :   PROGRAM Id LBRAC OUTPUT RBRAC                       {$$=createNode("ProgHeading",NULL,1,1,$2);}
-ProgBlock           :   VarPart FuncPart StatPart                           {$$=createNode("ProgBlock",NULL,1,3,$1,$2,$3);}
+ProgBlock           :   VarPart FuncPart StatPart                           {$$=createNode("ProgBlock",NULL,1,3,$1,createNode("FuncPart",NULL,0,1,$2),$3);}
 VarPart             :   VAR VarDeclaration SEMIC VarPartAux                 {$$=createNode("VarPart",NULL,0,2,$2,$4);}
                     |   /*%empty*/                                          {$$=createNode("VarPart",NULL,0,0);}
 VarPartAux          :   VarDeclaration SEMIC VarPartAux                     {$$=createNode("VarPartAux",NULL,1,2,$1,$3);}
@@ -152,8 +152,9 @@ VarDeclaration      :   IDList COLON Id                                     {$$=
 IDList              :   Id IDAux                                            {$$=createNode("IdList",NULL,1,2,$1,$2);}
 IDAux               :   COMMA Id IDAux                                      {$$=createNode("IDAux",NULL,1,2,$2,$3);}
                     |   /*%empty*/                                          {$$=NULL;}
-FuncPart            :   FuncDeclaration SEMIC FuncPart                      {$$=createNode("FuncPart",NULL,0,2,$1,$3);}
-                    |   /*%empty*/                                          {$$=createNode("FuncPart",NULL,0,0);}
+FuncPart            :   FuncDeclaration SEMIC FuncPart                      {$$=createNode("FuncPartSuperfluos",NULL,1,2,$1,$3);}
+                    |   /*%empty*/                                          {$$=NULL;}
+                    
 FuncDeclaration     :   FuncHeading SEMIC FuncBlock                         {$$=createNode("FuncDef",NULL,0,2,$1,$3);}
                     |   FuncIdent SEMIC FuncBlock                           {$$=createNode("FuncDef2",NULL,0,2,$1,$3);}
                     |   FuncHeading SEMIC FORWARD                           {$$=createNode("FuncDecl",NULL,0,1,$1);}
@@ -162,10 +163,12 @@ FuncHeading         :   FUNCTION Id FormalParamList COLON Id                {$$=
 FuncIdent           :   FUNCTION Id                                         {$$=$2;}
 FormalParamList     :   LBRAC FormalParams FormalParamListAux RBRAC         {$$=createNode("FuncParams",NULL,0,2,$2,$3);}
 FormalParamListAux  :   SEMIC FormalParams FormalParamListAux               {$$=createNode("FuncParamsAux",NULL,1,2,$2,$3);}
-                    |   /*%empty*/                                          {$$=createNode("FuncParams",NULL,0,0);}
+                    |   /*%empty*/                                          {$$=NULL;}
 FormalParams        :   VAR IDList COLON Id                                 {$$=createNode("VarParams",NULL,0,2,$2,$4);}
                     |   IDList COLON Id                                     {$$=createNode("Params",NULL,0,2,$1,$3);}
 FuncBlock           :   VarPart StatPart                                    {$$=createNode("FuncBlock",NULL,1,2,$1,$2);}
+
+
 StatPart            :   CompStat                                            {$$=createNode("StatPart",NULL,1,1,$1);}
 CompStat            :   BEGINTOKEN StatList END                             {$$=createNode("CompStat",NULL,1,1,$2);}
 StatList            :   Stat StatListAux                                    {$$=createNode("StatList",NULL,0,2,$1,$2);}
@@ -186,6 +189,8 @@ WritelnPListAux1    :   Expr                                                {$$=
                     |   STRING                                              {$$=createNode("String",$1,0,0);}
 WritelnPListAux2    :   COMMA WritelnPListAux1 WritelnPListAux2             {$$=createNode("WritelnPListAux2",NULL,1,2,$2,$3);}
                     |   /*%empty*/                                          {$$=NULL;}
+
+
 Expr                :   Expr OR Expr                                        {$$=createNode("Or",NULL,0,2,$1,$3);}
                     |   Expr AND Expr                                       {$$=createNode("And",NULL,0,2,$1,$3);}
                     |   Expr DIFF Expr                                      {$$=createNode("Neq",NULL,0,2,$1,$3);}
