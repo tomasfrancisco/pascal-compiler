@@ -64,7 +64,7 @@ exponent	"e"[+-]?{digit}+
 {letter}+({digit}|{letter})*					{yylval.str=strdup(yytext); 									return ID;			}
 {digit}+(("."{digit}+{exponent}?)|({exponent}))	{yylval.str=strdup(yytext); 									return REALLIT;		}
 '([^'\n]|'')*'									{yylval.str=strdup(yytext);										return STRING;		}
-{digit}+										{yylval.i=atoi(yytext);											return INTLIT;		}
+{digit}+										{yylval.str=strdup(yytext);										return INTLIT;		}
 '([^'\n]|'')*									{printf("Line %d, col %d: unterminated string\n", line, col - ((int)yyleng - 1)); 						}
 \n 												{line++; 					col = 0;												}
 [ \t]											{;																					}
