@@ -32,17 +32,17 @@
                             //ver enunciado as partes que têm (>=0), tipo funcpart e assim. Daí na gramática criar nós para isso
                             //em alguns casos %empty
             ast_nodeptr node = (ast_nodeptr) malloc(sizeof(ast_node));
-            node->type= strdup(type); //duplicar yylval senão dá merda
+            node->type= strdup(type); //duplicar yylval senão dá porcaria
             if(value!=NULL){ //Nós tais nós excessão isto era passado a null, logo crashava por ser tentado fazer dup (o tal problema que estragava a submissao no B)
-                node->value= strdup(value); //duplicar yylval senão dá merda
+                node->value= strdup(value); //duplicar yylval senão dá porcaria
             }
             node->nr_children=0;
             node->superfluo=0;
             return node;
         }else{
             ast_nodeptr node = (ast_nodeptr) malloc(sizeof(ast_node));
-            node->type= type; //duplicar yylval senão dá merda
-            node->value= value; //duplicar yylval senão dá merda
+            node->type= type; //duplicar yylval senão dá porcaria
+            node->value= value; //duplicar yylval senão dá porcaria
             node->nr_children=nr_children;
             node->superfluo=superfluo;
             node->children= (ast_nodeptr*) malloc(nr_children*sizeof(ast_nodeptr)); //Array de filhos
@@ -55,6 +55,11 @@
                 if(temp!=NULL){ //Em alguns casos, alguns argumentos são passados como NULL, tipo nos empty, pois não era preciso criar nó
                                 //Quando isto acontece, decrementa-se o nr de filhos do nó que estamos a criar
                                 //Isto poderia ser verificado antes de chamar a função criarNode e chamá-la com menos argumentos mas assim é mais fácil
+
+                    /*if (!strcmp(type, "CompStat") && !strcmp(temp->type,"StatList") && temp->nr_children==0 && temp->value==NULL){
+                        temp->superfluo=1;
+                    }*/
+
                     if(temp->superfluo){ //se o nó filho que estamos a analisar for superfluo, copiamos os filhos desse nó para o nó que estamos a criar
                         node->nr_children+=(temp->nr_children-1);//-1 pk já está a contar com o nó superfluo que é um filho e vai ser descartado
                         //printf("Incrementing nr_children of %s to %d\n",node->type,node->nr_children);
@@ -77,9 +82,16 @@
                     //Decrementa-se o nr de children para depois bater certo
                 }
             }
-            if (!strcmp(type, "StatList")) {
-                if (indice == 1) {
+            if (!strcmp(type,"StatList") && value==NULL) {
+                if (indice < 2) {
                     node->superfluo = 1;
+                }
+            }
+            if (!strcmp(type, "Program")) {
+                if (indice < 4) {
+                    node->children = (ast_nodeptr*) realloc (node->children,(node->nr_children+1)*sizeof(ast_nodeptr));
+                    node->nr_children++;
+                    node->children[3] = createNode("StatList",NULL,0,0);
                 }
             }
             va_end(valist);
@@ -105,7 +117,7 @@
             printf("..");
         }
         printf("%s",node->type);
-        if(node->value!=NULL){
+        if(node->value!=NULL && (strcmp(node->type,"StatList"))){
             printf("(%s)",node->value);
         }
         printf("\n");
@@ -177,7 +189,7 @@ FormalParams        :   VAR IDList COLON Id                                 {$$=
                     |   IDList COLON Id                                     {$$=createNode("Params",NULL,0,2,$1,$3);}
 
 FuncBlock           :   VarPart StatPart                                    {   if((!strcmp(((ast_nodeptr)$2)->type,"StatPart")) && (((ast_nodeptr)$2)->nr_children==0)){
-                                                                                    $$=createNode("FuncBlock",NULL,1,2,$1,createNode("StatList",NULL,0,0));
+                                                                                    $$=createNode("FuncBlock",NULL,1,2,$1,createNode("StatList","Folha",0,0));
                                                                                 } else $$=createNode("FuncBlock",NULL,1,2,$1,$2);
                                                                             ;}
 
@@ -187,31 +199,33 @@ CompStat            :   BEGINTOKEN StatList END                             {$$=
 StatList            :   Stat StatListAux                                    {$$=createNode("StatList",NULL,0,2,$1,$2);}
 StatListAux         :   SEMIC Stat StatListAux                              {$$=createNode("StatListAux",NULL,1,2,$2,$3);}
                     |   /*%empty*/                                          {$$=NULL;}
-Stat                :   CompStat                                            {$$=createNode("CompStat",NULL,1,1,$1);}
-                    |   IF Expr THEN Stat ELSE Stat                         {   if($4!=NULL && $6!=NULL){
+Stat                :   CompStat                                            {$$=createNode("Stat",NULL,1,1,$1);}
+                    |   IF Expr THEN Stat ELSE Stat                         {   if($4!=NULL && !(!strcmp(((ast_nodeptr)$4)->type, "Stat") && ((ast_nodeptr)$4)->nr_children == 0) && $6!=NULL && !(!strcmp(((ast_nodeptr)$6)->type, "Stat") && ((ast_nodeptr)$6)->nr_children == 0)){
                                                                                     $$=createNode("IfElse",NULL,0,3,$2,$4,$6);
                                                                                 }else{
                                                                                     ast_nodeptr n1= $4;
                                                                                     ast_nodeptr n2= $6;
-                                                                                    if($4==NULL){
-                                                                                        n1=createNode("StatList",NULL,0,0);
+                                                                                    if($4==NULL||(!strcmp(((ast_nodeptr)$4)->type, "Stat") && ((ast_nodeptr)$4)->nr_children == 0)){
+                                                                                        n1=createNode("StatList","Folha",0,0);
                                                                                     }
-                                                                                    if($6==NULL){
-                                                                                        n2=createNode("StatList",NULL,0,0);
+                                                                                    if($6==NULL||(!strcmp(((ast_nodeptr)$6)->type, "Stat") && ((ast_nodeptr)$6)->nr_children == 0)){
+                                                                                        n2=createNode("StatList","Folha",0,0);
                                                                                     }
                                                                                     $$=createNode("IfElse",NULL,0,3,$2,n1,n2);
                                                                                 }
                                                                             ;}
-                    |   IF Expr THEN Stat                                   {   if($4!=NULL){
-                                                                                    $$=createNode("IfElse",NULL,0,3,$2,$4,createNode("StatList",NULL,0,0));
-                                                                                }else $$=createNode("IfElse",NULL,0,3,$2,createNode("StatList",NULL,0,0),createNode("StatList",NULL,0,0));
+                    |   IF Expr THEN Stat                                   {   if($4!=NULL && !(!strcmp(((ast_nodeptr)$4)->type, "Stat") && ((ast_nodeptr)$4)->nr_children == 0)){
+                                                                                    $$=createNode("IfElse",NULL,0,3,$2,$4,createNode("StatList","Folha",0,0));
+                                                                                }else $$=createNode("IfElse",NULL,0,3,$2,createNode("StatList","Folha",0,0),createNode("StatList","Folha",0,0));
                                                                             ;}
-                    |   WHILE Expr DO Stat                                  {   if($4!=NULL ){
+                    |   WHILE Expr DO Stat                                  {   if($4!=NULL && ((ast_nodeptr)$4)->nr_children!=0) {
                                                                                     $$=createNode("While",NULL,0,2,$2,$4);
                                                                                 }else
-                                                                                    $$=createNode("While",NULL,0,2,$2,createNode("StatList",NULL,0,0));
+                                                                                    $$=createNode("While",NULL,0,2,$2,createNode("StatList","Folha",0,0));
                                                                             ;}
-                    |   REPEAT StatList UNTIL Expr                          {$$=createNode("Repeat",NULL,0,2,$2,$4);}
+                    |   REPEAT StatList UNTIL Expr                          {   if ($2==NULL ||(!strcmp(((ast_nodeptr)$2)->type, "StatList") && ((ast_nodeptr)$2)->nr_children == 0)){
+                                                                                        $$=createNode("Repeat",NULL,0,2,createNode("StatList","Folha",0,0),$4);
+                                                                                }else $$=createNode("Repeat",NULL,0,2,$2,$4);}
                     |   VAL LBRAC PARAMSTR LBRAC Expr RBRAC COMMA Id RBRAC  {$$=createNode("ValParam",NULL,0,2,$5,$8);}
                     |   Id ASSIGN Expr                                      {$$=createNode("Assign",NULL,0,2,$1,$3);}
                     |   WRITELN WritelnPList                                {$$=createNode("WriteLn",NULL,0,1,$2);}
