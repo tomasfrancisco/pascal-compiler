@@ -1,8 +1,6 @@
 # Untracked files:
 
 *.zip
-*.c
-*.h
 *.output
 
 mpascanner
