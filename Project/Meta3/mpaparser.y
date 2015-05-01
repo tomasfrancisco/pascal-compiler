@@ -5,6 +5,8 @@
     #include <string.h>
     #include <stdarg.h>
     #include "ast.h"
+    #include "symbol_table.h"
+    #include "semantics.h"
 
     char str[33];
     extern int line, col;
@@ -14,6 +16,7 @@
 
     int yylex();
     void yyerror(char *s);
+
 
 
     ast_nodeptr rootptr;
