@@ -5,6 +5,7 @@
     #include <string.h>
     #include <stdarg.h>
     #include "ast.h"
+    #include "symbol_table.h"
 
     char str[33];
     extern int line, col;
@@ -175,5 +176,9 @@ int main(int argc, char **argv)
     if(argc > 1 && strcmp(argv[1], "-t") == 0 && errors == 0) {
        printTree(rootptr,0);
     }
+    //printf("Teste");
+    Table semantic_tables = init_semantic_tables();
+    //for(Table next = semantic_tables; next; next = next->next)
+        //show_table(next);
     return 0;
 }
