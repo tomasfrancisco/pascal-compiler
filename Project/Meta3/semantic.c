@@ -1,16 +1,5 @@
 #include "semantic.h"
 
-char* to_lower(char* value) {
-    int i;
-    char* lower_value = (char*) malloc(sizeof(char) * 128);
-
-    for(i = 0;  i < strlen(value); i++) {
-        lower_value[i] = tolower(value[i]);
-    }
-    lower_value[i] = '\0';
-    return lower_value;
-}
-
 int analizeTree(ast_nodeptr node, Table table, char * type){
     int i;
 

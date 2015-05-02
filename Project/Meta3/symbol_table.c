@@ -1,5 +1,19 @@
 #include "symbol_table.h"
 
+char* to_lower(char* value) {
+	int i;
+	char* lower_value = NULL;
+	if(value!=NULL){
+		lower_value = (char*) malloc(sizeof(char) * 128);
+
+		for(i = 0;  i < strlen(value); i++) {
+			lower_value[i] = tolower(value[i]);
+		}
+		lower_value[i] = '\0';
+	}
+	return lower_value;
+}
+
 // Initilize table linked list with default tables
 Table init_semantic_tables() {
 	int i;
@@ -7,7 +21,7 @@ Table init_semantic_tables() {
 	strcpy(init_tables[0], "Outer");
 	strcpy(init_tables[1], "Function");
 	root_semantic_tables = NULL;
-	
+
 	Table new_semantic_tables = insert_table(NULL, init_tables[0]);
 	insert_info(new_semantic_tables, "boolean", "type", 1, "_boolean_");
 	insert_info(new_semantic_tables, "integer", "type", 1, "_integer_");
@@ -80,6 +94,10 @@ void show_tables(Table semantic_table) {
 
 // Insert new node at correspondent table
 Info insert_info(Table semantic_table, char* value, char* type, int constant, char* return_params) {
+	value = to_lower(value);
+	type = to_lower(type);
+	return_params = to_lower(return_params);
+
 	Table semantic_table_copy = semantic_table;
 	Info info_copy;
 	Info new_info = (Info) malloc(sizeof(symbols_line));
