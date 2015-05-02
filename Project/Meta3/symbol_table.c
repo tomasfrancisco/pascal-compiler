@@ -7,6 +7,7 @@ Table init_semantic_tables() {
 	strcpy(init_tables[0], "Outer");
 	strcpy(init_tables[1], "Function");
 	root_semantic_tables = NULL;
+	
 	Table new_semantic_tables = insert_table(NULL, init_tables[0]);
 	insert_info(new_semantic_tables, "boolean", "type", 1, "_boolean_");
 	insert_info(new_semantic_tables, "integer", "type", 1, "_integer_");
@@ -15,6 +16,7 @@ Table init_semantic_tables() {
 	insert_info(new_semantic_tables, "true", "true", 1, "_true_");
 	insert_info(new_semantic_tables, "paramcount", "function", 0, NULL);
 	insert_info(new_semantic_tables, "program", "program", 0, NULL);
+
 	Table function = insert_table(new_semantic_tables, init_tables[1]);
 	insert_info(function, "paramcount", "integer", 0, "return");
 

@@ -1,17 +1,28 @@
 #include "semantic.h"
 
-int analizeTree(ast_nodeptr node,Table table,char * type){
+char* to_lower(char* value) {
+    int i;
+    char* lower_value = (char*) malloc(sizeof(char) * 128);
+
+    for(i = 0;  i < strlen(value); i++) {
+        lower_value[i] = tolower(value[i]);
+    }
+    lower_value[i] = '\0';
+    return lower_value;
+}
+
+int analizeTree(ast_nodeptr node, Table table, char * type){
     int i;
     if(!strcmp(node->type,"Program")){
-        Table insert=insert_table(NULL,"Program");
-        for(i=0;i<node->nr_children;i++){
-            programTree(node->children[i],insert,NULL);
+        Table insert = insert_table(NULL,"Program");
+        for(i = 0; i < node->nr_children; i++){
+            programTree(node->children[i], insert, NULL);
         }
     }
 
     return 0;
 }
-int programTree(ast_nodeptr node,Table table,char * type){
+int programTree(ast_nodeptr node, Table table, char * type){
     int i;
 
     if(!strcmp(node->type,"VarPart")){
@@ -49,7 +60,7 @@ int varDeclTree(ast_nodeptr node,Table table,char * type){
 
 int insertIds(ast_nodeptr node,Table table,char * type){
     if(!strcmp(node->type,"Id")){
-        insert_info(table, node->value, type,0, NULL);
+        insert_info(table, to_lower(node->value), type, 0, NULL);
     }
 
     return 0;
