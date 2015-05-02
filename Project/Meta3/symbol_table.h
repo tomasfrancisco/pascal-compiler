@@ -12,15 +12,15 @@ typedef struct table {
 } table;
 
 typedef struct symbols_line {
-	char* value;
-	char* type;
+	char value[128];
+	char type[128];
 	int constant;
-	char* return_params;
+	char return_params[128];
 	Info next;
 } symbols_line;
 
 Table init_semantic_tables();
 Table insert_table(Table semantic_table, char* name);
-void show_table(Table semantic_table);
+void show_tables(Table semantic_table);
 Info insert_info(Table semantic_table, char* value, char* type, int constant, char* return_params);
 Info search_info(Table semantic_tables, char* value);
