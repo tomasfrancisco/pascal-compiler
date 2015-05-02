@@ -5,13 +5,18 @@ int analizeTree(ast_nodeptr node,Table table,char * type){
     if(!strcmp(node->type,"Program")){
         Table insert=insert_table(NULL,"Program");
         for(i=0;i<node->nr_children;i++){
-            analizeTree(node->children[i],insert,NULL);
+            programTree(node->children[i],insert,NULL);
         }
     }
 
+    return 0;
+}
+int programTree(ast_nodeptr node,Table table,char * type){
+    int i;
+
     if(!strcmp(node->type,"VarPart")){
         for(i=0;i<node->nr_children;i++){
-            analizeTree(node->children[i],table,NULL);
+            programTree(node->children[i],table,NULL);
         }
     }
 
