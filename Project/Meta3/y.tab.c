@@ -2146,8 +2146,9 @@ int main(int argc, char **argv)
     yyparse();
     if(argc > 1 && strcmp(argv[1], "-t") == 0 && errors == 0) {
        printTree(rootptr,0);
+       printf("\n");
     }
-    if(argc > 2 && strcmp(argv[2], "-s") == 0 && errors == 0) {
+    if((argc > 2 && strcmp(argv[2], "-s")== 0) || (argc > 1 && strcmp(argv[1], "-s")== 0)  && errors == 0) {
         show_tables(rootSemanticTables);
     }
     return 0;

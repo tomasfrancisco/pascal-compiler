@@ -60,6 +60,7 @@ void show_tables(Table semantic_table) {
 				printf("\t%s",next_info->return_params);
 			printf("\n");
 		}
+		printf("\n");
 	}
 }
 
