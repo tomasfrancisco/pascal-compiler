@@ -4,7 +4,7 @@
 #include <stdarg.h>
 #include "ast.h"
 
-ast_nodeptr createNode(char *type, char *value ,int superfluo, int nr_children, ...){
+ast_nodeptr createNode(int line, int column, char *type, char *value ,int superfluo, int nr_children, ...){
 	va_list valist;
 
 	if(nr_children==0 && superfluo != 1){ //se tem 0 ou é terminal ou é uma exceção que é impressa na mesma, mesmo que não tenha filhos
@@ -17,6 +17,8 @@ ast_nodeptr createNode(char *type, char *value ,int superfluo, int nr_children, 
 		}
 		node->nr_children=0;
 		node->superfluo=0;
+		node->line=line;
+		node->column=column;
 		return node;
 	}else{
 		ast_nodeptr node = (ast_nodeptr) malloc(sizeof(ast_node));
@@ -24,6 +26,8 @@ ast_nodeptr createNode(char *type, char *value ,int superfluo, int nr_children, 
 		node->value= value; //duplicar yylval senão dá porcaria
 		node->nr_children=nr_children;
 		node->superfluo=superfluo;
+		node->line=line;
+		node->column=column;
 		node->children= (ast_nodeptr*) malloc(nr_children*sizeof(ast_nodeptr)); //Array de filhos
 		int i,j,indice=0; //Este indice é usado para manter a posição no array de filhos do nó a criar. Pk com os reallocs vamos estar a aumentar o nr de filhos e temos de manter um indice independente do indice original de filhos a percorrer
 		ast_nodeptr temp;
@@ -70,7 +74,7 @@ ast_nodeptr createNode(char *type, char *value ,int superfluo, int nr_children, 
 		if (indice < 4) {
 			node->children = (ast_nodeptr*) realloc (node->children,(node->nr_children+1)*sizeof(ast_nodeptr));
 			node->nr_children++;
-			node->children[3] = createNode("StatList",NULL,0,0);
+			node->children[3] = createNode(-1,-1,"StatList",NULL,0,0);
 		}
 	}
 	va_end(valist);
@@ -99,6 +103,7 @@ int printTree(ast_nodeptr node,int treedepth){
 	if(node->value!=NULL && (strcmp(node->type,"StatList"))){
 		printf("(%s)",node->value);
 	}
+	//printf(" Line:%d Column:%d",node->line,node->column);
 	printf("\n");
 	for(i=0;i<node->nr_children;i++){
 		printTree(node->children[i],treedepth+1);
