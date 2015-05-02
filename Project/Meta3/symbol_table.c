@@ -25,7 +25,7 @@ Table init_semantic_tables() {
 Table insert_table(Table semantic_table, char* name) {
 	Table semantic_table_copy = root_semantic_tables;
 	Table new_table = (Table) malloc(sizeof(table));
-
+	Table temporary = NULL;
 	if(root_semantic_tables == NULL) {
 		if(new_table != NULL) {
 			sprintf(new_table->name, "%s", name);
@@ -33,13 +33,15 @@ Table insert_table(Table semantic_table, char* name) {
 		root_semantic_tables = new_table;
 		return new_table;
 	}
-	
+
 	if(semantic_table_copy==NULL){
 		semantic_table_copy=root_semantic_tables;
 		while(semantic_table_copy->next != NULL)
 			semantic_table_copy = semantic_table_copy->next;
-	}else
+	}else{
 		semantic_table_copy = semantic_table;
+		temporary = semantic_table->next; // Para o caso de estarmos a inserir a meio da lista
+	}
 
 
 	semantic_table_copy->next = new_table;
@@ -47,7 +49,7 @@ Table insert_table(Table semantic_table, char* name) {
 	if(new_table != NULL) {
 		sprintf(new_table->name, "%s", name);
 		new_table->info = NULL;
-		new_table->next = NULL;
+		new_table->next = temporary;
 	} else printf("Error inserting %s table.\n", name);
 
 	return new_table;
