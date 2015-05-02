@@ -1,13 +1,13 @@
-all: mpaparser.zip mpaparser
+all: mpasemantic.zip mpasemantic
 
-mpaparser.zip: mpaparser.y mpaparser.l
-	zip mpaparser.zip mpaparser.y mpaparser.l
+mpasemantic.zip: mpasemantic.y mpasemantic.l semantic.c semantic.h ast.c ast.h symbol_table.c symbol_table.h
+	zip mpasemantic.zip mpasemantic.y mpasemantic.l semantic.c semantic.h ast.c ast.h symbol_table.c symbol_table.h
 
-mpaparser: lex.yy.c y.tab.c ast.c symbol_table.c semantic.c
-	gcc -o mpaparser y.tab.c lex.yy.c ast.c symbol_table.c semantic.c -ll -ly
+mpasemantic: lex.yy.c y.tab.c ast.c symbol_table.c semantic.c
+	gcc -o mpasemantic y.tab.c lex.yy.c ast.c symbol_table.c semantic.c -ll -ly
 
-y.tab.c: mpaparser.y
-	yacc -v -o y.tab.c -d mpaparser.y
+y.tab.c: mpasemantic.y
+	yacc -v -o y.tab.c -d mpasemantic.y
 
-lex.yy.c: mpaparser.l
-	lex -o lex.yy.c mpaparser.l
+lex.yy.c: mpasemantic.l
+	lex -o lex.yy.c mpasemantic.l

@@ -27,7 +27,7 @@ Table init_semantic_tables() {
 	insert_info(new_semantic_tables, "integer", "type", 1, "_integer_");
 	insert_info(new_semantic_tables, "real", "type", 1, "_real_");
 	insert_info(new_semantic_tables, "false", "boolean", 1, "_false_");
-	insert_info(new_semantic_tables, "true", "true", 1, "_true_");
+	insert_info(new_semantic_tables, "true", "boolean", 1, "_true_");
 	insert_info(new_semantic_tables, "paramcount", "function", 0, NULL);
 	insert_info(new_semantic_tables, "program", "program", 0, NULL);
 
