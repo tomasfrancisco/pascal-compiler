@@ -4,9 +4,7 @@
     #include <stdlib.h>
     #include <string.h>
     #include <stdarg.h>
-    #include "ast.h"
     #include "semantic.h"
-    #include "symbol_table.h"
 
     char str[33];
     extern int line, col;
@@ -180,6 +178,7 @@ int main(int argc, char **argv)
        printf("\n");
     }
     if((argc > 2 && strcmp(argv[2], "-s")== 0) || (argc > 1 && strcmp(argv[1], "-s")== 0)  && errors == 0) {
+        analizeTree(rootptr,root_semantic_tables,NULL);
         show_tables(root_semantic_tables);
     }
     return 0;
