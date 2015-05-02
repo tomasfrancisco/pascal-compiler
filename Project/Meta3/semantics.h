@@ -1,1 +1,0 @@
-int error_counter = 0;

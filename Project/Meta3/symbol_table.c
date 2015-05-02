@@ -4,8 +4,8 @@
 Table init_semantic_tables() {
 	int i;
 	char init_tables[2][128];
-	strcpy(init_tables[0], "===== Outer Symbol Table =====");
-	strcpy(init_tables[1], "===== Function Symbol Table =====");
+	strcpy(init_tables[0], "Outer Symbol Table");
+	strcpy(init_tables[1], "Function Symbol Table");
 
 	Table new_semantic_tables = insert_table(NULL, init_tables[0]);
 	insert_info(new_semantic_tables, "boolean", "_type_", 1, "_boolean_");
@@ -16,25 +16,31 @@ Table init_semantic_tables() {
 	insert_info(new_semantic_tables, "paramcount", "_function_", 0, NULL);
 	insert_info(new_semantic_tables, "program", "_program_", 0, NULL);
 	Table function = insert_table(new_semantic_tables, init_tables[1]);
-	insert_info(function, "paramcount", "integer", 0, "return");
+	insert_info(function, "paramcount", "_integer_", 0, "return");
 
 	return new_semantic_tables;
 }
 
 // Insert new table at the end of table linked list
 Table insert_table(Table semantic_table, char* name) {
-	Table semantic_table_copy = semantic_table;
+	Table semantic_table_copy = root_semantic_tables;
 	Table new_table = (Table) malloc(sizeof(table));
 
-	if(semantic_table_copy == NULL) {
+	if(root_semantic_tables == NULL) {
 		if(new_table != NULL) {
 			sprintf(new_table->name, "%s", name);
 		} else printf("Error inserting %s table.\n", name);
+		root_semantic_tables = new_table;
 		return new_table;
 	}
+	
+	if(semantic_table_copy==NULL){
+		semantic_table_copy=root_semantic_tables;
+		while(semantic_table_copy->next != NULL)
+			semantic_table_copy = semantic_table_copy->next;
+	}else
+		semantic_table_copy = semantic_table;
 
-	while(semantic_table_copy->next != NULL)
-		semantic_table_copy = semantic_table_copy->next;
 
 	semantic_table_copy->next = new_table;
 
@@ -43,6 +49,7 @@ Table insert_table(Table semantic_table, char* name) {
 		new_table->info = NULL;
 		new_table->next = NULL;
 	} else printf("Error inserting %s table.\n", name);
+
 	return new_table;
 }
 
@@ -50,14 +57,15 @@ Table insert_table(Table semantic_table, char* name) {
 void show_tables(Table semantic_table) {
 	Table next_table;
 	for(next_table = semantic_table; next_table != NULL; next_table = next_table->next) {
-		printf("%s\n", next_table->name);
+		printf("===== %s =====\n", next_table->name);
 		Info next_info;
 		for(next_info = next_table->info; next_info != NULL; next_info = next_info->next){
 			printf("%s\t%s", next_info->value, next_info->type);
 			if(next_info->constant==1)
 				printf("\t%s", "constant");
 			if(next_info->return_params!=NULL)
-				printf("\t%s",next_info->return_params);
+					printf("\t%s",next_info->return_params);
+
 			printf("\n");
 		}
 		printf("\n");

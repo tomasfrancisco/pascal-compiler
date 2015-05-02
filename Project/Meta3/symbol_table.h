@@ -2,8 +2,11 @@
 #include <stdio.h>
 #include <string.h>
 
+
 typedef struct table* Table;
 typedef struct symbols_line* Info;
+
+Table root_semantic_tables;
 
 typedef struct table {
 	char name[32];
