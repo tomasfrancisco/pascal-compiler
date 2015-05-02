@@ -6,7 +6,7 @@ Table init_semantic_tables() {
 	char init_tables[2][128];
 	strcpy(init_tables[0], "Outer");
 	strcpy(init_tables[1], "Function");
-
+	Table root_semantic_tables = NULL;
 	Table new_semantic_tables = insert_table(NULL, init_tables[0]);
 	insert_info(new_semantic_tables, "boolean", "type", 1, "_boolean_");
 	insert_info(new_semantic_tables, "integer", "type", 1, "_integer_");
