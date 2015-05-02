@@ -2,6 +2,7 @@
 
 int analizeTree(ast_nodeptr node,Table table,char * type){
     int i;
+
     if(!strcmp(node->type,"Program")){
         Table insert=insert_table(NULL,"Program");
         for(i=0;i<node->nr_children;i++){
@@ -9,8 +10,18 @@ int analizeTree(ast_nodeptr node,Table table,char * type){
         }
     }
 
+    if(!strcmp(node->type,"FuncDef")){
+        Table insert=insert_table(NULL,"Function");
+        insert_info(insert,node->children[0]->value,node->children[2]->value,0,"return");
+        funcParamsTree(node->children[1], insert,NULL);
+    }
+
+    for(i=0;i<node->nr_children;i++){
+        analizeTree(node->children[i],root_semantic_tables,NULL);
+    }
     return 0;
 }
+
 int programTree(ast_nodeptr node,Table table,char * type){
     int i;
 
@@ -22,13 +33,31 @@ int programTree(ast_nodeptr node,Table table,char * type){
 
     if(!strcmp(node->type,"FuncPart")){
         for(i=0;i<node->nr_children;i++){
-            funcTree(node->children[i],table,node->children[node->nr_children-1]->value);
+            funcIdInsert(node->children[i],table,node->children[node->nr_children-1]->value);
         }
     }
     return 0;
 }
 
-int funcTree(ast_nodeptr node,Table table,char * type){
+int funcParamsTree(ast_nodeptr node,Table table,char * type){
+    int i,j;
+    for(i=0;i<node->nr_children;i++){
+        if(!strcmp(node->children[i]->type,"Params")){
+            for(j=0;j<node->children[i]->nr_children-1;j++){
+                insert_info(table,node->children[i]->children[j]->value,node->children[i]->children[node->children[i]->nr_children-1]->value,0,"param");
+            }
+        }
+
+        if(!strcmp(node->type,"VarParams")){
+            for(j=0;j<node->children[i]->nr_children-1;j++){
+                insert_info(table,node->children[i]->children[j]->value,node->children[i]->children[node->children[i]->nr_children-1]->value,0,"varparam");
+            }
+        }
+    }
+    return 0;
+}
+
+int funcIdInsert(ast_nodeptr node,Table table,char * type){
     if(!strcmp(node->type,"FuncDef")){
         insert_info(table, node->children[0]->value, "function",0, NULL);
     }
