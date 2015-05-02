@@ -29,10 +29,8 @@ int programTree(ast_nodeptr node,Table table,char * type){
 }
 
 int funcTree(ast_nodeptr node,Table table,char * type){
-    int i;
-
     if(!strcmp(node->type,"FuncDef")){
-        insert_info(table, node->children[i]->value, "function",0, NULL);
+        insert_info(table, node->children[0]->value, "function",0, NULL);
     }
 
     return 0;
