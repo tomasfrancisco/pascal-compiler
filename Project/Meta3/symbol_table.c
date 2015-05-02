@@ -16,7 +16,7 @@ Table init_semantic_tables() {
 	insert_info(new_semantic_tables, "true", "_true_", 1, "_true_");
 	insert_info(new_semantic_tables, "paramcount", "_function_", 0, NULL);
 	insert_info(new_semantic_tables, "program", "_program_", 0, NULL);
-	
+
 	Table function = insert_table(new_semantic_tables, init_tables[1]);
 	insert_info(function, "paramcount", "integer", 0, "return");
 
@@ -50,9 +50,11 @@ Table insert_table(Table semantic_table, char* name) {
 
 // Print every information of semantic tables
 void show_tables(Table semantic_table) {
-	for(Table next_table = semantic_table; next_table != NULL; next_table = next_table->next) {
+	Table next_table;
+	for(next_table = semantic_table; next_table != NULL; next_table = next_table->next) {
 		printf("%s\n", next_table->name);
-		for(Info next_info = next_table->info; next_info != NULL; next_info = next_info->next)
+		Info next_info;
+		for(next_info = next_table->info; next_info != NULL; next_info = next_info->next)
 			printf("%s\t%s\t%d\t%s\n", next_info->value, next_info->type, next_info->constant, next_info->return_params);
 	}
 }
@@ -65,7 +67,7 @@ Info insert_info(Table semantic_table, char* value, char* type, int constant, ch
 
 	if(new_info != NULL) {
 		if(semantic_table_copy != NULL) {
-			if(semantic_table_copy->info == NULL) 
+			if(semantic_table_copy->info == NULL)
 				semantic_table_copy->info = new_info;
 			else {
 				info_copy = semantic_table_copy->info;
@@ -87,9 +89,12 @@ Info insert_info(Table semantic_table, char* value, char* type, int constant, ch
 
 // Search the node for each table
 Info search_info(Table semantic_tables, char* value) {
-	for(Table next = semantic_tables; next; next = next->next)
-		for(Info line = next->info; line; line = line->next)
+	Table next;
+	for( next = semantic_tables; next; next = next->next){
+		Info line;
+		for( line = next->info; line; line = line->next)
 			if(strcmp(line->value, value) == 0)
 				return line;
+	}
 	return NULL;
 }

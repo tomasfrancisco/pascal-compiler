@@ -1,0 +1,19 @@
+program gcd(output);
+begin
+	begin end;
+	begin
+		begin
+			begin
+				begin end;
+				if a then else
+				begin end
+			end;
+			i := 3;
+		end;
+	end;
+	begin end;
+	begin end;
+	begin end;
+	i := 2;
+end
+.

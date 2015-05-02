@@ -128,7 +128,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 27 "mpaparser.y" /* yacc.c:1909  */
+#line 28 "mpaparser.y" /* yacc.c:1909  */
 
     char ch;
     int i;
