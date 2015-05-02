@@ -26,6 +26,17 @@ int programTree(ast_nodeptr node,Table table,char * type){
         }
     }
 
+    if(!strcmp(node->type,"FuncPart")){
+        for(i=0;i<node->nr_children;i++){
+            programTree(node->children[i],table,node->children[node->nr_children-1]->value);
+        }
+    }
+
+    if(!strcmp(node->type,"FuncDef")){
+        printf("What\n");
+        insert_info(table, node->children[0]->value, "function",0, NULL);
+    }
+
 
     return 0;
 }
