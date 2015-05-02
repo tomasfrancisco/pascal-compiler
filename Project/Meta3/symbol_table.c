@@ -81,10 +81,10 @@ void show_tables(Table semantic_table) {
 		Info next_info;
 		for(next_info = next_table->info; next_info != NULL; next_info = next_info->next){
 			printf("%s\t%s", next_info->value, next_info->type);
-			if(next_info->constant==1)
+			if(next_info->constant==1) {
 				printf("\t%s", "constant");
-			if(next_info->return_params!=NULL)
-					printf("\t%s",next_info->return_params);
+				printf("\t%s",next_info->return_params);
+			}
 
 			printf("\n");
 		}
