@@ -16,7 +16,10 @@ Table init_semantic_tables() {
 	insert_info(new_semantic_tables, "true", "_true_", 1, "_true_");
 	insert_info(new_semantic_tables, "paramcount", "_function_", 0, NULL);
 	insert_info(new_semantic_tables, "program", "_program_", 0, NULL);
-	insert_table(new_semantic_tables, init_tables[i]);
+	
+	Table function = insert_table(new_semantic_tables, init_tables[1]);
+	insert_info(function, "paramcount", "integer", 0, "return");
+
 	return new_semantic_tables;
 }
 
@@ -32,22 +35,25 @@ Table insert_table(Table semantic_table, char* name) {
 		return new_table;
 	}
 
+	while(semantic_table_copy->next != NULL)
+		semantic_table_copy = semantic_table_copy->next;
+
+	semantic_table_copy->next = new_table;
+
 	if(new_table != NULL) {
 		sprintf(new_table->name, "%s", name);
 		new_table->info = NULL;
-		while(semantic_table_copy->next != NULL)
-			semantic_table_copy = semantic_table_copy->next;
-		semantic_table_copy->next = new_table;
+		new_table->next = NULL;
 	} else printf("Error inserting %s table.\n", name);
 	return new_table;
 }
 
 // Print every information of semantic tables
 void show_tables(Table semantic_table) {
-	for(Table next_table = semantic_table; next_table; next_table = next_table->next) {
+	for(Table next_table = semantic_table; next_table != NULL; next_table = next_table->next) {
 		printf("%s\n", next_table->name);
-		for(Info next_info = next_table->info; next_info; next_info = next_info->next)
-			printf("%s %s %d %s\n", next_info->value, next_info->type, next_info->constant, next_info->return_params);
+		for(Info next_info = next_table->info; next_info != NULL; next_info = next_info->next)
+			printf("%s\t%s\t%d\t%s\n", next_info->value, next_info->type, next_info->constant, next_info->return_params);
 	}
 }
 
@@ -73,6 +79,7 @@ Info insert_info(Table semantic_table, char* value, char* type, int constant, ch
 		sprintf(new_info->type, "%s", type);
 		new_info->constant = constant;
 		sprintf(new_info->return_params, "%s", return_params);
+		new_info->next = NULL;
 
 	} else printf("Error inserting %s type. \n", type);
 	return new_info;
