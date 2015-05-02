@@ -7,7 +7,6 @@ Table init_semantic_tables() {
 	strcpy(init_tables[0], "===== Outer Symbol Table =====");
 	strcpy(init_tables[1], "===== Function Symbol Table =====");
 
-
 	Table new_semantic_tables = insert_table(NULL, init_tables[0]);
 	insert_info(new_semantic_tables, "boolean", "_type_", 1, "_boolean_");
 	insert_info(new_semantic_tables, "integer", "_type_", 1, "_integer_");
@@ -16,7 +15,6 @@ Table init_semantic_tables() {
 	insert_info(new_semantic_tables, "true", "_true_", 1, "_true_");
 	insert_info(new_semantic_tables, "paramcount", "_function_", 0, NULL);
 	insert_info(new_semantic_tables, "program", "_program_", 0, NULL);
-
 	Table function = insert_table(new_semantic_tables, init_tables[1]);
 	insert_info(function, "paramcount", "integer", 0, "return");
 
@@ -54,8 +52,14 @@ void show_tables(Table semantic_table) {
 	for(next_table = semantic_table; next_table != NULL; next_table = next_table->next) {
 		printf("%s\n", next_table->name);
 		Info next_info;
-		for(next_info = next_table->info; next_info != NULL; next_info = next_info->next)
-			printf("%s\t%s\t%d\t%s\n", next_info->value, next_info->type, next_info->constant, next_info->return_params);
+		for(next_info = next_table->info; next_info != NULL; next_info = next_info->next){
+			printf("%s\t%s", next_info->value, next_info->type);
+			if(next_info->constant==1)
+				printf("\t%s", "constant");
+			if(next_info->return_params!=NULL)
+				printf("\t%s",next_info->return_params);
+			printf("\n");
+		}
 	}
 }
 
@@ -80,7 +84,9 @@ Info insert_info(Table semantic_table, char* value, char* type, int constant, ch
 		sprintf(new_info->value, "%s", value);
 		sprintf(new_info->type, "%s", type);
 		new_info->constant = constant;
-		sprintf(new_info->return_params, "%s", return_params);
+		if(return_params!=NULL){
+			sprintf(new_info->return_params, "%s", return_params);
+		}else sprintf(new_info->return_params, "%s", "");
 		new_info->next = NULL;
 
 	} else printf("Error inserting %s type. \n", type);

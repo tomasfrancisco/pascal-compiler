@@ -82,13 +82,12 @@
     int yylex();
     void yyerror(char *s);
 
-
-
+    Table rootSemanticTables;
 
     ast_nodeptr rootptr;
 
 
-#line 92 "y.tab.c" /* yacc.c:339  */
+#line 91 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -206,7 +205,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 28 "mpaparser.y" /* yacc.c:355  */
+#line 27 "mpaparser.y" /* yacc.c:355  */
 
     char ch;
     int i;
@@ -215,7 +214,7 @@ union YYSTYPE
                 //não perguntes, não vale a pena, basicamente todos os tipos de coisas que queiras passar, tens de declarar aqui)
                 //mas devido a outro retardamento do yacc e lex, não pode ser ast_nodeptr pk y+l declaram union antes de declarar structs por isso não era reconhecido, granda atrofio)
 
-#line 219 "y.tab.c" /* yacc.c:355  */
+#line 218 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -230,7 +229,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 234 "y.tab.c" /* yacc.c:358  */
+#line 233 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -531,14 +530,14 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    49,    49,    50,    51,    52,    53,    54,    55,    56,
-      57,    58,    59,    60,    61,    63,    64,    66,    67,    68,
-      70,    71,    73,    74,    75,    76,    78,    79,    81,    87,
-      88,    89,    90,    91,    92,    93,   107,   111,   116,   119,
-     120,   121,   122,   123,   124,   125,   126,   127,   128,   130,
-     131,   132,   133,   134,   135,   136,   138,   139,   141,   142,
-     143,   144,   145,   147,   148,   149,   150,   151,   152,   154,
-     155,   156,   157,   158,   159,   163,   164,   165,   168
+       0,    48,    48,    49,    50,    51,    52,    53,    54,    55,
+      56,    57,    58,    59,    60,    62,    63,    65,    66,    67,
+      69,    70,    72,    73,    74,    75,    77,    78,    80,    86,
+      87,    88,    89,    90,    91,    92,   106,   110,   115,   118,
+     119,   120,   121,   122,   123,   124,   125,   126,   127,   129,
+     130,   131,   132,   133,   134,   135,   137,   138,   140,   141,
+     142,   143,   144,   146,   147,   148,   149,   150,   151,   153,
+     154,   155,   156,   157,   158,   162,   163,   164,   167
 };
 #endif
 
@@ -1419,208 +1418,208 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 49 "mpaparser.y" /* yacc.c:1646  */
+#line 48 "mpaparser.y" /* yacc.c:1646  */
     {rootptr=createNode(line,col,"Program",NULL,0,2,(yyvsp[-3].ptr),(yyvsp[-1].ptr));}
-#line 1425 "y.tab.c" /* yacc.c:1646  */
+#line 1424 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 50 "mpaparser.y" /* yacc.c:1646  */
+#line 49 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"ProgHeading",NULL,1,1,(yyvsp[-3].ptr));}
-#line 1431 "y.tab.c" /* yacc.c:1646  */
+#line 1430 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 51 "mpaparser.y" /* yacc.c:1646  */
+#line 50 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"ProgBlock",NULL,1,3,(yyvsp[-2].ptr),(yyvsp[-1].ptr),(yyvsp[0].ptr));}
-#line 1437 "y.tab.c" /* yacc.c:1646  */
+#line 1436 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 52 "mpaparser.y" /* yacc.c:1646  */
+#line 51 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"VarPart",NULL,0,2,(yyvsp[-2].ptr),(yyvsp[0].ptr));}
-#line 1443 "y.tab.c" /* yacc.c:1646  */
+#line 1442 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 53 "mpaparser.y" /* yacc.c:1646  */
+#line 52 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(-1,-1,"VarPart",NULL,0,0);}
-#line 1449 "y.tab.c" /* yacc.c:1646  */
+#line 1448 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 54 "mpaparser.y" /* yacc.c:1646  */
+#line 53 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"VarPartAux",NULL,1,2,(yyvsp[-2].ptr),(yyvsp[0].ptr));}
-#line 1455 "y.tab.c" /* yacc.c:1646  */
+#line 1454 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 55 "mpaparser.y" /* yacc.c:1646  */
+#line 54 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=NULL;}
-#line 1461 "y.tab.c" /* yacc.c:1646  */
+#line 1460 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 56 "mpaparser.y" /* yacc.c:1646  */
+#line 55 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"VarDecl",NULL,0,2,(yyvsp[-2].ptr),(yyvsp[0].ptr));}
-#line 1467 "y.tab.c" /* yacc.c:1646  */
+#line 1466 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 57 "mpaparser.y" /* yacc.c:1646  */
+#line 56 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"IdList",NULL,1,2,(yyvsp[-1].ptr),(yyvsp[0].ptr));}
-#line 1473 "y.tab.c" /* yacc.c:1646  */
+#line 1472 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 58 "mpaparser.y" /* yacc.c:1646  */
+#line 57 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"IDAux",NULL,1,2,(yyvsp[-1].ptr),(yyvsp[0].ptr));}
-#line 1479 "y.tab.c" /* yacc.c:1646  */
+#line 1478 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 59 "mpaparser.y" /* yacc.c:1646  */
+#line 58 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=NULL;}
-#line 1485 "y.tab.c" /* yacc.c:1646  */
+#line 1484 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 60 "mpaparser.y" /* yacc.c:1646  */
+#line 59 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"FuncPart",NULL,0,2,(yyvsp[-2].ptr),(yyvsp[0].ptr));}
-#line 1491 "y.tab.c" /* yacc.c:1646  */
+#line 1490 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 61 "mpaparser.y" /* yacc.c:1646  */
+#line 60 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(-1,-1,"FuncPart",NULL,0,0);}
-#line 1497 "y.tab.c" /* yacc.c:1646  */
+#line 1496 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 63 "mpaparser.y" /* yacc.c:1646  */
+#line 62 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"FuncPart",NULL,1,2,(yyvsp[-2].ptr),(yyvsp[0].ptr));}
-#line 1503 "y.tab.c" /* yacc.c:1646  */
+#line 1502 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 64 "mpaparser.y" /* yacc.c:1646  */
+#line 63 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(-1,-1,"FuncPart",NULL,1,0);}
-#line 1509 "y.tab.c" /* yacc.c:1646  */
+#line 1508 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 66 "mpaparser.y" /* yacc.c:1646  */
+#line 65 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"FuncDecl",NULL,0,1,(yyvsp[-2].ptr));}
-#line 1515 "y.tab.c" /* yacc.c:1646  */
+#line 1514 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 67 "mpaparser.y" /* yacc.c:1646  */
+#line 66 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"FuncDef2",NULL,0,2,(yyvsp[-2].ptr),(yyvsp[0].ptr));}
-#line 1521 "y.tab.c" /* yacc.c:1646  */
+#line 1520 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 68 "mpaparser.y" /* yacc.c:1646  */
+#line 67 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"FuncDef",NULL,0,2,(yyvsp[-2].ptr),(yyvsp[0].ptr));}
-#line 1527 "y.tab.c" /* yacc.c:1646  */
+#line 1526 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 70 "mpaparser.y" /* yacc.c:1646  */
+#line 69 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"FuncHeading",NULL,1,3,(yyvsp[-3].ptr),(yyvsp[-2].ptr),(yyvsp[0].ptr));}
-#line 1533 "y.tab.c" /* yacc.c:1646  */
+#line 1532 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 71 "mpaparser.y" /* yacc.c:1646  */
+#line 70 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"FuncHeading2",NULL,1,3,(yyvsp[-2].ptr),createNode(line,col,"FuncParams",NULL,0,0),(yyvsp[0].ptr));}
-#line 1539 "y.tab.c" /* yacc.c:1646  */
+#line 1538 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 73 "mpaparser.y" /* yacc.c:1646  */
+#line 72 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=(yyvsp[0].ptr);}
-#line 1545 "y.tab.c" /* yacc.c:1646  */
+#line 1544 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 74 "mpaparser.y" /* yacc.c:1646  */
+#line 73 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"FuncParams",NULL,0,2,(yyvsp[-2].ptr),(yyvsp[-1].ptr));}
-#line 1551 "y.tab.c" /* yacc.c:1646  */
+#line 1550 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 75 "mpaparser.y" /* yacc.c:1646  */
+#line 74 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"FuncParamsAux",NULL,1,2,(yyvsp[-1].ptr),(yyvsp[0].ptr));}
-#line 1557 "y.tab.c" /* yacc.c:1646  */
+#line 1556 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 76 "mpaparser.y" /* yacc.c:1646  */
+#line 75 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=NULL;}
-#line 1563 "y.tab.c" /* yacc.c:1646  */
+#line 1562 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 78 "mpaparser.y" /* yacc.c:1646  */
+#line 77 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"VarParams",NULL,0,2,(yyvsp[-2].ptr),(yyvsp[0].ptr));}
-#line 1569 "y.tab.c" /* yacc.c:1646  */
+#line 1568 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 79 "mpaparser.y" /* yacc.c:1646  */
+#line 78 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Params",NULL,0,2,(yyvsp[-2].ptr),(yyvsp[0].ptr));}
-#line 1575 "y.tab.c" /* yacc.c:1646  */
+#line 1574 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 81 "mpaparser.y" /* yacc.c:1646  */
+#line 80 "mpaparser.y" /* yacc.c:1646  */
     {   if((!strcmp(((ast_nodeptr)(yyvsp[0].ptr))->type,"StatPart")) && (((ast_nodeptr)(yyvsp[0].ptr))->nr_children==0)){
                                                                                     (yyval.ptr)=createNode(line,col,"FuncBlock",NULL,1,2,(yyvsp[-1].ptr),createNode(-1,-1,"StatList","Folha",0,0));
                                                                                 } else (yyval.ptr)=createNode(line,col,"FuncBlock",NULL,1,2,(yyvsp[-1].ptr),(yyvsp[0].ptr));
                                                                             ;}
-#line 1584 "y.tab.c" /* yacc.c:1646  */
+#line 1583 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 87 "mpaparser.y" /* yacc.c:1646  */
+#line 86 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"StatPart",NULL,1,1,(yyvsp[0].ptr));}
-#line 1590 "y.tab.c" /* yacc.c:1646  */
+#line 1589 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 88 "mpaparser.y" /* yacc.c:1646  */
+#line 87 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"CompStat",NULL,1,1,(yyvsp[-1].ptr));}
-#line 1596 "y.tab.c" /* yacc.c:1646  */
+#line 1595 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 89 "mpaparser.y" /* yacc.c:1646  */
+#line 88 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"StatList",NULL,0,2,(yyvsp[-1].ptr),(yyvsp[0].ptr));}
-#line 1602 "y.tab.c" /* yacc.c:1646  */
+#line 1601 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 90 "mpaparser.y" /* yacc.c:1646  */
+#line 89 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"StatListAux",NULL,1,2,(yyvsp[-1].ptr),(yyvsp[0].ptr));}
-#line 1608 "y.tab.c" /* yacc.c:1646  */
+#line 1607 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 91 "mpaparser.y" /* yacc.c:1646  */
+#line 90 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=NULL;}
-#line 1614 "y.tab.c" /* yacc.c:1646  */
+#line 1613 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 92 "mpaparser.y" /* yacc.c:1646  */
+#line 91 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Stat",NULL,1,1,(yyvsp[0].ptr));}
-#line 1620 "y.tab.c" /* yacc.c:1646  */
+#line 1619 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 93 "mpaparser.y" /* yacc.c:1646  */
+#line 92 "mpaparser.y" /* yacc.c:1646  */
     {   if((yyvsp[-2].ptr)!=NULL && !(!strcmp(((ast_nodeptr)(yyvsp[-2].ptr))->type, "Stat") && ((ast_nodeptr)(yyvsp[-2].ptr))->nr_children == 0) && (yyvsp[0].ptr)!=NULL && !(!strcmp(((ast_nodeptr)(yyvsp[0].ptr))->type, "Stat") && ((ast_nodeptr)(yyvsp[0].ptr))->nr_children == 0)){
                                                                                     (yyval.ptr)=createNode(line,col,"IfElse",NULL,0,3,(yyvsp[-4].ptr),(yyvsp[-2].ptr),(yyvsp[0].ptr));
                                                                                 }else{
@@ -1635,278 +1634,278 @@ yyreduce:
                                                                                     (yyval.ptr)=createNode(line,col,"IfElse",NULL,0,3,(yyvsp[-4].ptr),n1,n2);
                                                                                 }
                                                                             ;}
-#line 1639 "y.tab.c" /* yacc.c:1646  */
+#line 1638 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 107 "mpaparser.y" /* yacc.c:1646  */
+#line 106 "mpaparser.y" /* yacc.c:1646  */
     {   if((yyvsp[0].ptr)!=NULL && !(!strcmp(((ast_nodeptr)(yyvsp[0].ptr))->type, "Stat") && ((ast_nodeptr)(yyvsp[0].ptr))->nr_children == 0)){
                                                                                     (yyval.ptr)=createNode(line,col,"IfElse",NULL,0,3,(yyvsp[-2].ptr),(yyvsp[0].ptr),createNode(-1,-1,"StatList","Folha",0,0));
                                                                                 }else (yyval.ptr)=createNode(line,col,"IfElse",NULL,0,3,(yyvsp[-2].ptr),createNode(-1,-1,"StatList","Folha",0,0),createNode(-1,-1,"StatList","Folha",0,0));
                                                                             ;}
-#line 1648 "y.tab.c" /* yacc.c:1646  */
+#line 1647 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 111 "mpaparser.y" /* yacc.c:1646  */
+#line 110 "mpaparser.y" /* yacc.c:1646  */
     {   if((yyvsp[0].ptr)!=NULL && ((ast_nodeptr)(yyvsp[0].ptr))->nr_children!=0) {
                                                                                     (yyval.ptr)=createNode(line,col,"While",NULL,0,2,(yyvsp[-2].ptr),(yyvsp[0].ptr));
                                                                                 }else
                                                                                     (yyval.ptr)=createNode(line,col,"While",NULL,0,2,(yyvsp[-2].ptr),createNode(-1,-1,"StatList","Folha",0,0));
                                                                             ;}
-#line 1658 "y.tab.c" /* yacc.c:1646  */
+#line 1657 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 116 "mpaparser.y" /* yacc.c:1646  */
+#line 115 "mpaparser.y" /* yacc.c:1646  */
     {   if ((yyvsp[-2].ptr)==NULL ||(!strcmp(((ast_nodeptr)(yyvsp[-2].ptr))->type, "StatList") && ((ast_nodeptr)(yyvsp[-2].ptr))->nr_children == 0)){
                                                                                         (yyval.ptr)=createNode(line,col,"Repeat",NULL,0,2,createNode(-1,-1,"StatList","Folha",0,0),(yyvsp[0].ptr));
                                                                                 }else (yyval.ptr)=createNode(line,col,"Repeat",NULL,0,2,(yyvsp[-2].ptr),(yyvsp[0].ptr));}
-#line 1666 "y.tab.c" /* yacc.c:1646  */
+#line 1665 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 119 "mpaparser.y" /* yacc.c:1646  */
+#line 118 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"ValParam",NULL,0,2,(yyvsp[-4].ptr),(yyvsp[-1].ptr));}
-#line 1672 "y.tab.c" /* yacc.c:1646  */
+#line 1671 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 120 "mpaparser.y" /* yacc.c:1646  */
+#line 119 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Assign",NULL,0,2,(yyvsp[-2].ptr),(yyvsp[0].ptr));}
-#line 1678 "y.tab.c" /* yacc.c:1646  */
+#line 1677 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 121 "mpaparser.y" /* yacc.c:1646  */
+#line 120 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"WriteLn",NULL,0,1,(yyvsp[0].ptr));}
-#line 1684 "y.tab.c" /* yacc.c:1646  */
+#line 1683 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 122 "mpaparser.y" /* yacc.c:1646  */
+#line 121 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"WriteLn",NULL,0,0);}
-#line 1690 "y.tab.c" /* yacc.c:1646  */
+#line 1689 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 123 "mpaparser.y" /* yacc.c:1646  */
+#line 122 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=NULL;}
-#line 1696 "y.tab.c" /* yacc.c:1646  */
+#line 1695 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 124 "mpaparser.y" /* yacc.c:1646  */
+#line 123 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"WritelnPList",NULL,1,2,(yyvsp[-2].ptr),(yyvsp[-1].ptr));}
-#line 1702 "y.tab.c" /* yacc.c:1646  */
+#line 1701 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 125 "mpaparser.y" /* yacc.c:1646  */
+#line 124 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"WritelnPListAux1Expr",NULL,1,1,(yyvsp[0].ptr));}
-#line 1708 "y.tab.c" /* yacc.c:1646  */
+#line 1707 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 126 "mpaparser.y" /* yacc.c:1646  */
+#line 125 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"String",(yyvsp[0].str),0,0);}
-#line 1714 "y.tab.c" /* yacc.c:1646  */
+#line 1713 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 127 "mpaparser.y" /* yacc.c:1646  */
+#line 126 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"WritelnPListAux2",NULL,1,2,(yyvsp[-1].ptr),(yyvsp[0].ptr));}
-#line 1720 "y.tab.c" /* yacc.c:1646  */
+#line 1719 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 128 "mpaparser.y" /* yacc.c:1646  */
+#line 127 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=NULL;}
-#line 1726 "y.tab.c" /* yacc.c:1646  */
+#line 1725 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 130 "mpaparser.y" /* yacc.c:1646  */
+#line 129 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Eq",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1732 "y.tab.c" /* yacc.c:1646  */
+#line 1731 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 131 "mpaparser.y" /* yacc.c:1646  */
+#line 130 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Neq",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1738 "y.tab.c" /* yacc.c:1646  */
+#line 1737 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 132 "mpaparser.y" /* yacc.c:1646  */
+#line 131 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Lt",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1744 "y.tab.c" /* yacc.c:1646  */
+#line 1743 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 133 "mpaparser.y" /* yacc.c:1646  */
+#line 132 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Gt",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1750 "y.tab.c" /* yacc.c:1646  */
+#line 1749 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 134 "mpaparser.y" /* yacc.c:1646  */
+#line 133 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Leq",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1756 "y.tab.c" /* yacc.c:1646  */
+#line 1755 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 135 "mpaparser.y" /* yacc.c:1646  */
+#line 134 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Geq",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1762 "y.tab.c" /* yacc.c:1646  */
+#line 1761 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 136 "mpaparser.y" /* yacc.c:1646  */
+#line 135 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"SimpleExpr",NULL, 1, 1, (yyvsp[0].ptr));}
-#line 1768 "y.tab.c" /* yacc.c:1646  */
+#line 1767 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 138 "mpaparser.y" /* yacc.c:1646  */
+#line 137 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Term",NULL, 1, 1, (yyvsp[0].ptr));}
-#line 1774 "y.tab.c" /* yacc.c:1646  */
+#line 1773 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 139 "mpaparser.y" /* yacc.c:1646  */
+#line 138 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"AddOP",NULL, 1, 1, (yyvsp[0].ptr));}
-#line 1780 "y.tab.c" /* yacc.c:1646  */
+#line 1779 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 141 "mpaparser.y" /* yacc.c:1646  */
+#line 140 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Add",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1786 "y.tab.c" /* yacc.c:1646  */
+#line 1785 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 142 "mpaparser.y" /* yacc.c:1646  */
+#line 141 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Sub",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1792 "y.tab.c" /* yacc.c:1646  */
+#line 1791 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 143 "mpaparser.y" /* yacc.c:1646  */
+#line 142 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Or",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1798 "y.tab.c" /* yacc.c:1646  */
+#line 1797 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 144 "mpaparser.y" /* yacc.c:1646  */
+#line 143 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Minus",NULL, 0, 1, (yyvsp[0].ptr));}
-#line 1804 "y.tab.c" /* yacc.c:1646  */
+#line 1803 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 145 "mpaparser.y" /* yacc.c:1646  */
+#line 144 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Plus",NULL, 0, 1, (yyvsp[0].ptr));}
-#line 1810 "y.tab.c" /* yacc.c:1646  */
+#line 1809 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 147 "mpaparser.y" /* yacc.c:1646  */
+#line 146 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"RealDiv",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1816 "y.tab.c" /* yacc.c:1646  */
+#line 1815 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 148 "mpaparser.y" /* yacc.c:1646  */
+#line 147 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Mul",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1822 "y.tab.c" /* yacc.c:1646  */
+#line 1821 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 149 "mpaparser.y" /* yacc.c:1646  */
+#line 148 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"And",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1828 "y.tab.c" /* yacc.c:1646  */
+#line 1827 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 150 "mpaparser.y" /* yacc.c:1646  */
+#line 149 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Div",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1834 "y.tab.c" /* yacc.c:1646  */
+#line 1833 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 151 "mpaparser.y" /* yacc.c:1646  */
+#line 150 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Mod",NULL, 0, 2, (yyvsp[-2].ptr), (yyvsp[0].ptr));}
-#line 1840 "y.tab.c" /* yacc.c:1646  */
+#line 1839 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 152 "mpaparser.y" /* yacc.c:1646  */
+#line 151 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Factor",NULL, 1, 1, (yyvsp[0].ptr));}
-#line 1846 "y.tab.c" /* yacc.c:1646  */
+#line 1845 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 154 "mpaparser.y" /* yacc.c:1646  */
+#line 153 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=(yyvsp[0].ptr);}
-#line 1852 "y.tab.c" /* yacc.c:1646  */
+#line 1851 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 155 "mpaparser.y" /* yacc.c:1646  */
+#line 154 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Not",NULL, 0, 1, (yyvsp[0].ptr));}
-#line 1858 "y.tab.c" /* yacc.c:1646  */
+#line 1857 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 156 "mpaparser.y" /* yacc.c:1646  */
+#line 155 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"LbracRbrac",NULL, 1, 1, (yyvsp[-1].ptr));}
-#line 1864 "y.tab.c" /* yacc.c:1646  */
+#line 1863 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 157 "mpaparser.y" /* yacc.c:1646  */
+#line 156 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Call",NULL, 0, 2, (yyvsp[-1].ptr), (yyvsp[0].ptr));}
-#line 1870 "y.tab.c" /* yacc.c:1646  */
+#line 1869 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 158 "mpaparser.y" /* yacc.c:1646  */
+#line 157 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"IntLit",(yyvsp[0].str), 0,0);}
-#line 1876 "y.tab.c" /* yacc.c:1646  */
+#line 1875 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 159 "mpaparser.y" /* yacc.c:1646  */
+#line 158 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"RealLit",(yyvsp[0].str), 0,0);}
-#line 1882 "y.tab.c" /* yacc.c:1646  */
+#line 1881 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 163 "mpaparser.y" /* yacc.c:1646  */
+#line 162 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"ParamList",NULL,1,2,(yyvsp[-2].ptr),(yyvsp[-1].ptr));}
-#line 1888 "y.tab.c" /* yacc.c:1646  */
+#line 1887 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 164 "mpaparser.y" /* yacc.c:1646  */
+#line 163 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"ParamListAux",NULL,1,2,(yyvsp[-1].ptr),(yyvsp[0].ptr));}
-#line 1894 "y.tab.c" /* yacc.c:1646  */
+#line 1893 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 165 "mpaparser.y" /* yacc.c:1646  */
+#line 164 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=NULL;}
-#line 1900 "y.tab.c" /* yacc.c:1646  */
+#line 1899 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 168 "mpaparser.y" /* yacc.c:1646  */
+#line 167 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.ptr)=createNode(line,col,"Id",(yyvsp[0].str),0,0);}
-#line 1906 "y.tab.c" /* yacc.c:1646  */
+#line 1905 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1910 "y.tab.c" /* yacc.c:1646  */
+#line 1909 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2134,7 +2133,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 170 "mpaparser.y" /* yacc.c:1906  */
+#line 169 "mpaparser.y" /* yacc.c:1906  */
 
 
 void yyerror (char *s) {
@@ -2143,9 +2142,13 @@ void yyerror (char *s) {
 }
 int main(int argc, char **argv)
 {
+    rootSemanticTables = init_semantic_tables();
     yyparse();
     if(argc > 1 && strcmp(argv[1], "-t") == 0 && errors == 0) {
        printTree(rootptr,0);
+    }
+    if(argc > 2 && strcmp(argv[2], "-s") == 0 && errors == 0) {
+        show_tables(rootSemanticTables);
     }
     return 0;
 }

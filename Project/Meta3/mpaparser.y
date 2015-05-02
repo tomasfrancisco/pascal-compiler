@@ -17,8 +17,7 @@
     int yylex();
     void yyerror(char *s);
 
-
-
+    Table rootSemanticTables;
 
     ast_nodeptr rootptr;
 
@@ -175,9 +174,13 @@ void yyerror (char *s) {
 }
 int main(int argc, char **argv)
 {
+    rootSemanticTables = init_semantic_tables();
     yyparse();
     if(argc > 1 && strcmp(argv[1], "-t") == 0 && errors == 0) {
        printTree(rootptr,0);
+    }
+    if(argc > 2 && strcmp(argv[2], "-s") == 0 && errors == 0) {
+        show_tables(rootSemanticTables);
     }
     return 0;
 }
