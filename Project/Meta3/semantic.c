@@ -20,14 +20,16 @@ int analizeTree(ast_nodeptr node, Table table, char * type){
         Table insert=insert_table(NULL,"Function");
         insert_info(insert,node->children[0]->value,node->children[2]->value,0,"return");
         funcParamsTree(node->children[1], insert,NULL);
-        programTree(node->children[3], insert, NULL);
+        funcVarTree(node->children[3], insert, NULL);
     }
+
+
 
     if(!strcmp(node->type, "FuncDef2")) {
         Table insert = search_table(node->children[0]->value);
         if(insert != NULL) {
             for(i = 0; i < node->nr_children; i++)
-                programTree(node->children[i], insert, NULL);
+                funcVarTree(node->children[i], insert, NULL);
         }
         else
             insert = insert_table(NULL, "Function");
@@ -53,6 +55,18 @@ int programTree(ast_nodeptr node,Table table,char * type){
             funcIdInsert(node->children[i],table,node->children[node->nr_children-1]->value);
         }
     }
+    return 0;
+}
+
+int funcVarTree(ast_nodeptr node,Table table,char * type){
+    int i;
+
+    if(!strcmp(node->type,"VarPart")){
+        for(i=0;i<node->nr_children;i++){
+            varDeclTree(node->children[i],table,NULL);
+        }
+    }
+
     return 0;
 }
 
