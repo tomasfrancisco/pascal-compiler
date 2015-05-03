@@ -10,10 +10,27 @@ int analizeTree(ast_nodeptr node, Table table, char * type){
         }
     }
 
+    if(!strcmp(node->type, "FuncDecl")) {
+        Table insert = insert_table(NULL, "Function");
+        insert_info(insert,node->children[0]->value,node->children[2]->value,0,"return");
+        funcParamsTree(node->children[1], insert,NULL);
+    }
+
     if(!strcmp(node->type,"FuncDef")){
         Table insert=insert_table(NULL,"Function");
         insert_info(insert,node->children[0]->value,node->children[2]->value,0,"return");
         funcParamsTree(node->children[1], insert,NULL);
+        programTree(node->children[3], insert, NULL);
+    }
+
+    if(!strcmp(node->type, "FuncDef2")) {
+        Table insert = search_table(node->children[0]->value);
+        if(insert != NULL) {
+            for(i = 0; i < node->nr_children; i++)
+                programTree(node->children[i], insert, NULL);
+        }
+        else
+            insert = insert_table(NULL, "Function");
     }
 
     for(i=0;i<node->nr_children;i++){
@@ -48,7 +65,7 @@ int funcParamsTree(ast_nodeptr node,Table table,char * type){
             }
         }
 
-        if(!strcmp(node->type,"VarParams")){
+        if(!strcmp(node->children[i]->type,"VarParams")){
             for(j=0;j<node->children[i]->nr_children-1;j++){
                 insert_info(table,node->children[i]->children[j]->value,node->children[i]->children[node->children[i]->nr_children-1]->value,0,"varparam");
             }
@@ -60,6 +77,10 @@ int funcParamsTree(ast_nodeptr node,Table table,char * type){
 int funcIdInsert(ast_nodeptr node,Table table,char * type){
     if(!strcmp(node->type,"FuncDef")){
         insert_info(table, node->children[0]->value, "function",0, NULL);
+    }
+
+    if(!strcmp(node->type, "FuncDecl")) {
+        insert_info(table, node->children[0]->value, "function", 0, NULL);
     }
 
     return 0;
@@ -78,7 +99,7 @@ int varDeclTree(ast_nodeptr node,Table table,char * type){
 
 int insertIds(ast_nodeptr node,Table table,char * type){
     if(!strcmp(node->type,"Id")){
-        insert_info(table, to_lower(node->value), type, 0, NULL);
+        insert_info(table, node->value, type, 0, NULL);
     }
 
     return 0;

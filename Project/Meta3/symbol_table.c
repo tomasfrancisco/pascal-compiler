@@ -105,6 +105,7 @@ Info insert_info(Table semantic_table, char* value, char* type, int constant, ch
 	Table semantic_table_copy = semantic_table;
 	Info info_copy;
 	Info new_info = (Info) malloc(sizeof(symbols_line));
+
 	if(new_info != NULL) {
 		if(semantic_table_copy != NULL) {
 			if(semantic_table_copy->info == NULL)
@@ -139,3 +140,15 @@ Info search_info(Table semantic_tables, char* value) {
 	}
 	return NULL;
 }
+
+Table search_table(char* value) {
+	Table copy = root_semantic_tables;
+	value = to_lower(value);
+	for(copy; copy; copy = copy->next) {
+		if(strcmp(copy->info->value, value) == 0 && strcmp(copy->info->return_params, "return") == 0) {
+			return copy;
+		}
+	}
+	return NULL;
+}
+
