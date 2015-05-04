@@ -74,14 +74,42 @@ int funcParamsTree(ast_nodeptr node,Table table,char * type){
     int i,j;
     for(i=0;i<node->nr_children;i++){
         if(!strcmp(node->children[i]->type,"Params")){
-            for(j=0;j<node->children[i]->nr_children-1;j++){
-                insert_info(table,node->children[i]->children[j]->value,node->children[i]->children[node->children[i]->nr_children-1]->value,0,"param");
+            Info info = get_info(table, node->children[i]->children[node->children[i]->nr_children-1]->value);
+            if(info != NULL) {
+                //printf("\nvalue:%s-type:%s\n", info->value, info->type);
+                if(strcmp(info->type, "_type_") != 0) {
+                    // Erro type expected
+                    set_error(node->children[i]->children[node->children[i]->nr_children-1], "Type identifier expected");
+                } else {
+                    for(j=0;j<node->children[i]->nr_children-1;j++){
+                        insert_info(table,node->children[i]->children[j]->value,node->children[i]->children[node->children[i]->nr_children-1]->value,0,"param");
+                    }
+                }
+            } else {
+                // Symbol not defined
+                char error_reason[128];
+                sprintf(error_reason, "Symbol %s not defined", node->children[i]->children[node->children[i]->nr_children-1]->value);
+                set_error(node->children[i]->children[node->children[i]->nr_children-1], error_reason);
             }
         }
 
         if(!strcmp(node->children[i]->type,"VarParams")){
-            for(j=0;j<node->children[i]->nr_children-1;j++){
-                insert_info(table,node->children[i]->children[j]->value,node->children[i]->children[node->children[i]->nr_children-1]->value,0,"varparam");
+            Info info = get_info(table, node->children[i]->children[node->children[i]->nr_children-1]->value);
+            if(info != NULL) {
+                //printf("\nvalue:%s-type:%s\n", info->value, info->type);
+                if(strcmp(info->type, "_type_") != 0) {
+                    // Erro type expected
+                    set_error(node->children[i]->children[node->children[i]->nr_children-1], "Type identifier expected");
+                } else {
+                    for(j=0;j<node->children[i]->nr_children-1;j++){
+                        insert_info(table,node->children[i]->children[j]->value,node->children[i]->children[node->children[i]->nr_children-1]->value,0,"varparam");
+                    }
+                }
+            } else {
+                // Symbol not defined
+                char error_reason[128];
+                sprintf(error_reason, "Symbol %s not defined", node->children[i]->children[node->children[i]->nr_children-1]->value);
+                set_error(node->children[i]->children[node->children[i]->nr_children-1], error_reason);
             }
         }
     }

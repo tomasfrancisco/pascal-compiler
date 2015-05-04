@@ -160,10 +160,12 @@ Info get_info(Table semantic_table, char* value) {
 	}
 
 	// Programa
-	for(current_info = program->info; current_info; current_info = current_info->next) {
-		// existe o nó já declarado com o nome value
-		if(strcmp(value, current_info->value) == 0) {
-			return current_info;
+	if(semantic_table != program){
+		for(current_info = program->info; current_info; current_info = current_info->next) {
+			// existe o nó já declarado com o nome value
+			if(strcmp(value, current_info->value) == 0) {
+				return current_info;
+			}
 		}
 	}
 	//Paramcount
