@@ -52,11 +52,19 @@ int analizeTree(Table current_table,ast_nodeptr node, Table table, char * type){
                 funcVarTree(node->children[i], insert, NULL);
         }
         else
-            insert = insert_table("Function");
+            set_error(node->children[0],"Function identifier expected");
     }
 
     if(!strcmp(node->type, "WriteLn")) {
         checkWriteLn(node,current_table);
+    }
+
+    /*if(!strcmp(node->type, "Assign")) {
+        checkAssign(node,current_table);
+    }*/
+
+    if(!strcmp(node->type, "Call")) {
+        checkCall(node,current_table);
     }
 
     for(i=0;i<node->nr_children;i++){
@@ -213,22 +221,116 @@ int checkWriteLn(ast_nodeptr node,Table current_table){
                 if(strcmp(info->type,"_function_")){
                     set_error(funcIdNode,"Function identifier expected");
                 }
+                checkCall(node->children[i],current_table);
             }
         }else if (!strcmp(node->children[i]->type,"Id")){
             //printf("Table %s: %s\n",current_table->name,current_table->info->value);
             //printf("Value: %s\n",node->children[i]->value);
-            if(get_info_scope(current_table,node->children[i]->value)==NULL){
+            Info info;
+            if((info=get_info_scope(current_table,node->children[i]->value))==NULL){
                 char error_reason[128];
                 sprintf(error_reason, "Symbol %s not defined", node->children[i]->value);
                 set_error(node->children[i],error_reason);
             }else{
                 //printf("%s",current_table->name);
-                Info info = get_info_scope(current_table,node->children[i]->value);//Foi criado uma variavel global para guardar em que tabela estamos
-                                                                                   //Ao descer a árvore. Sempre que se insere uma tabela nova, muda-se este valor
-                if(!strcmp(info->type,"_type_")){
+                if(!strcmp(info->type,"_function_")){
+                    //Quer dizer que encontrou uma função com 0 argumentos;
+                    int nr_arguments=0;
+                    Table func_table= get_func_table(NULL,info->value);
+                    info=func_table->info;
+                    while(info!=NULL){
+                        if(!strcmp(info->return_params,"param")||!strcmp(info->return_params,"varparam"))
+                            nr_arguments++;
+                            info=info->next;
+                        }
+                        //printf("Nr arguments: %d",nr_arguments);
+                        if(nr_arguments!=0){
+                            char error_reason[128];
+                            sprintf(error_reason, "Wrong number of arguments in call to function %s (got %d, expected %d)", node->children[0]->value,0,nr_arguments);
+                            set_error(node->children[0],error_reason);
+                        }
+                }
+                else if(!strcmp(info->type,"_type_")){
                     set_error(node->children[i],"Cannot write values of type _type_");
                 }
             }
+        }
+    }
+}
+
+int checkAssign(ast_nodeptr node,Table current_table){
+    ast_nodeptr expected = node->children[0];
+    ast_nodeptr gotten = node->children[1];
+        Info info;
+        printf("What\n");
+        if((info=get_info_scope(current_table,expected->value))==NULL){
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", expected->value);
+            set_error(expected,error_reason);
+        }else{
+            char * type = checkExpression(gotten,current_table);
+            if(strcmp(type,info->type)){
+                char error_reason[128];
+                sprintf(error_reason, "Incompatible type in assigment to %s (got %s expected %s)",expected->value,type,info->type);
+                set_error(expected,error_reason);
+            }
+        }
+}
+
+char * checkExpression(ast_nodeptr node, Table current_table){
+
+    char * left, *right;
+
+    if(node->nr_children>0 && node->children[0]!=NULL){
+        left = checkExpression(node->children[0],current_table);
+    }
+    if(node->nr_children>=2){
+        if(node->children[1]!=NULL){
+            right = checkExpression(node->children[1],current_table);
+        }
+    }
+
+    if(!strcmp(node->type,"Id")){
+        Info info;
+        if((info=get_info_scope(current_table,node->value))==NULL){
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->value);
+            set_error(node,error_reason);
+        }else{
+            return info->type;
+        }
+    }
+
+    if(!strcmp(node->type,"Eq") ||!strcmp(node->type,"Neq") || !strcmp(node->type,"Eq") || !strcmp(node->type,"Lt") || !strcmp(node->type,"Gt")
+        || !strcmp(node->type,"Leq") || !strcmp(node->type,"Geq")){
+        return "_boolean_";
+    }
+
+    return "";
+}
+
+int checkCall(ast_nodeptr node ,Table current_table){
+    Info info;
+    Table func_table;
+    //printf("Func: %s\n",node->children[0]->value);
+    if((info=get_info_func(current_table,node->children[0]->value))==NULL){
+        char error_reason[128];
+        sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+        set_error(node->children[0],error_reason);
+    }else{
+        int nr_arguments=0;
+        func_table= get_func_table(NULL,node->children[0]->value);
+        info=func_table->info;
+        while(info!=NULL){
+            if(!strcmp(info->return_params,"param")||!strcmp(info->return_params,"varparam"))
+                nr_arguments++;
+            info=info->next;
+        }
+        //printf("Nr arguments: %d",nr_arguments);
+        if(nr_arguments!=node->nr_children-1){
+            char error_reason[128];
+            sprintf(error_reason, "Wrong number of arguments in call to function %s (got %d, expected %d)", node->children[0]->value,node->nr_children-1,nr_arguments);
+            set_error(node->children[0],error_reason);
         }
     }
 }

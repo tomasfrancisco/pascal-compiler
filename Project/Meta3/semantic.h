@@ -11,3 +11,4 @@ int funcIdInsert(ast_nodeptr node,Table table,char * type);
 int funcVarTree(ast_nodeptr node,Table table,char * type);
 int funcParamsTree(ast_nodeptr node,Table table,char * type);
 void set_error(ast_nodeptr node, char* reason);
+char * checkExpression(ast_nodeptr node, Table current_table);

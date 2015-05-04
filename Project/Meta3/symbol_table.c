@@ -228,3 +228,29 @@ Info get_info_func(Table semantic_table, char* value) {//Encontra a informação
 
 	return NULL;
 }
+
+Table get_func_table(Table semantic_table, char* value) {//Encontra a informação sobre a função de nome value nas tabelas todas.
+
+	value = to_lower(value);
+
+	Table program = root_semantic_tables->next->next;
+
+	if(semantic_table == NULL) {
+		//Começar da primeira tabela a seguir a program (Primeira tabela de funções)
+		semantic_table=program->next;
+	}
+
+	// Function
+	Info current_info;
+	for(semantic_table;semantic_table;semantic_table=semantic_table->next){
+		for(current_info = semantic_table->info; current_info; current_info = current_info->next) {
+			// existe o nó já declarado com o nome value
+			if(strcmp(value, current_info->value) == 0) {
+				return semantic_table;
+			}
+		}
+	}
+
+
+	return NULL;
+}
