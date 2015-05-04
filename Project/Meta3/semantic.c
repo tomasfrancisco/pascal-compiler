@@ -5,9 +5,6 @@ int analizeTree(ast_nodeptr node, Table table, char * type){
 
     if(!strcmp(node->type,"Program")){
         Table insert = insert_table("Program");
-        if(insert == NULL) {
-            printf("NULL no program\n");
-        }
         for(i = 0; i < node->nr_children; i++){
             programTree(node->children[i], insert, NULL);
         }
@@ -21,9 +18,6 @@ int analizeTree(ast_nodeptr node, Table table, char * type){
 
     if(!strcmp(node->type,"FuncDef")){
         Table insert=insert_table("Function");
-        if(insert == NULL) {
-            printf("NULL no funcdef\n");
-        }
         insert_info(insert,node->children[0]->value,node->children[2]->value,0,"return");
         funcParamsTree(node->children[1], insert,NULL);
         funcVarTree(node->children[3], insert, NULL);
@@ -125,7 +119,7 @@ int varDeclTree(ast_nodeptr node,Table table,char * type){
             //printf("\nvalue:%s-type:%s\n", info->value, info->type);
             if(strcmp(info->type, "_type_") != 0) {
                 // Erro type expected
-                printf("Type expected\n");
+                set_error(node, "Type identifier expected");
             } else {
                 for(i=0;i<node->nr_children-1;i++) {
                     insertIds(node->children[i], table, node->children[node->nr_children-1]->value);
@@ -133,12 +127,16 @@ int varDeclTree(ast_nodeptr node,Table table,char * type){
             }
         } else {
             // Symbol not defined
-            printf("Symbol not defined\n");
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[node->nr_children-1]->value);
+            set_error(node, error_reason);
         }   
     }
 
     return 0;
 }
+
+
 
 int insertIds(ast_nodeptr node, Table table, char * type){
     if(!strcmp(node->type,"Id")){
@@ -146,11 +144,18 @@ int insertIds(ast_nodeptr node, Table table, char * type){
             insert_info(table, node->value, type, 0, NULL);
         } else {
             // Duplicated var
-            printf("Duplicated var\n");
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s already defined", node->value);
+            set_error(node, error_reason);
         }
 
         
     }
 
     return 0;
+}
+
+void set_error(ast_nodeptr node, char* reason) {
+    printf("Line %d, col %d: %s\n", node->line, node->column, reason);
+    exit(0);
 }
