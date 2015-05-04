@@ -22,7 +22,7 @@ Table init_semantic_tables() {
 	strcpy(init_tables[1], "Function");
 	root_semantic_tables = NULL;
 
-	Table new_semantic_tables = insert_table(NULL, init_tables[0]);
+	Table new_semantic_tables = insert_table(init_tables[0]);
 	insert_info(new_semantic_tables, "boolean", "type", 1, "_boolean_");
 	insert_info(new_semantic_tables, "integer", "type", 1, "_integer_");
 	insert_info(new_semantic_tables, "real", "type", 1, "_real_");
@@ -31,45 +31,32 @@ Table init_semantic_tables() {
 	insert_info(new_semantic_tables, "paramcount", "function", 0, NULL);
 	insert_info(new_semantic_tables, "program", "program", 0, NULL);
 
-	Table function = insert_table(new_semantic_tables, init_tables[1]);
+	Table function = insert_table(init_tables[1]);
 	insert_info(function, "paramcount", "integer", 0, "return");
 
 	return new_semantic_tables;
 }
 
 // Insert new table at the end of table linked list
-Table insert_table(Table semantic_table, char* name) {
-	Table semantic_table_copy = semantic_table;
+Table insert_table(char* name) {
+	Table current_table;
+
+
 	Table new_table = (Table) malloc(sizeof(table));
-	Table temporary = NULL;
-	if(root_semantic_tables == NULL) {
-		if(new_table != NULL) {
-			sprintf(new_table->name, "%s", name);
-			new_table->info = NULL;
-			new_table->next = NULL;
-		} else printf("Error inserting %s table.\n", name);
-		root_semantic_tables = new_table;
-		return new_table;
-	}
-
-	if(semantic_table_copy==NULL){
-		semantic_table_copy=root_semantic_tables;
-		while(semantic_table_copy->next != NULL)
-			semantic_table_copy = semantic_table_copy->next;
-	}else{
-		semantic_table_copy = semantic_table;
-		temporary = semantic_table->next; // Para o caso de estarmos a inserir a meio da lista
-	}
-
-
-	semantic_table_copy->next = new_table;
-
 	if(new_table != NULL) {
 		sprintf(new_table->name, "%s", name);
 		new_table->info = NULL;
-		new_table->next = temporary;
-	} else printf("Error inserting %s table.\n", name);
+		new_table->next = NULL;
+	}
 
+	if(root_semantic_tables == NULL) {
+		root_semantic_tables = new_table;
+	} else {
+		current_table = root_semantic_tables;
+		while(current_table->next != NULL) 
+			current_table = current_table->next;
+		current_table->next = new_table;
+	}
 	return new_table;
 }
 
@@ -151,4 +138,96 @@ Table search_table(char* value) {
 	}
 	return NULL;
 }
+
+Info get_info(Table semantic_table, char* value) {
+	value = to_lower(value);
+	Table outer = root_semantic_tables;
+	Table program = root_semantic_tables->next->next;
+
+	if(semantic_table == NULL) {
+		//printf("MERDA NA FUNÇÃO GET_INFO\n");
+		return NULL;
+	}
+
+	// Function
+	Info current_info;
+	for(current_info = semantic_table->info; current_info; current_info = current_info->next) {
+		// existe o nó já declarado com o nome value
+		if(strcmp(value, current_info->value) == 0) {
+			return current_info;
+		}
+	}
+
+	// Programa
+	for(current_info = program->info; current_info; current_info = current_info->next) {
+		// existe o nó já declarado com o nome value
+		if(strcmp(value, current_info->value) == 0) {
+			return current_info;
+		}
+	}
+
+	// Outer
+	for(current_info = outer->info; current_info; current_info = current_info->next) {
+		// existe o nó já declarado com o nome value
+		if(strcmp(value, current_info->value) == 0) {
+			return current_info;
+		}
+	}
+
+	return NULL;
+}
+
+int exists_decl(Table semantic_table, char* value) {
+	value = to_lower(value);
+
+	if(semantic_table == NULL) {
+		//printf("MERDA NA FUNÇÃO EXISTS_DECL\n");
+		return 0;
+	}
+
+	
+	Info current_info;
+	for(current_info = semantic_table->info; current_info; current_info = current_info->next) {
+		if(strcmp(value, current_info->value) == 0)
+			return 1;
+	}
+	return 0;
+}
+
+/*int check_decl(Table semantic_table, char* value, char* type) {
+	Table current_table = semantic_table;
+	Info current_info;
+
+	Table outer = root_semantic_tables;
+	Table function = root_semantic_tables->next;
+	Table program = root_semantic_tables->next->next;
+
+	Info types = root_semantic_tables->info;
+
+	// Check this table
+	for(current_info = current_table->info; current_info; current_info = current_info->next) {
+		// Check if the type exists
+		printf("---%s : %s - %s---\n", current_info->value, value, type);
+		if(strcmp(type, current_info->value) == 0) {
+			for(types; types; types = types->next) {
+				if(strcmp(current_info->type, types->value)) {
+					if(strcmp(types->value, "type")) {
+						return 1;
+					}
+				}
+			}
+		}
+	}
+
+	if((current_table != outer) && (current_table != function) && (current_table != program)) {
+		return check_decl(program, value, type);
+	} else if((current_table != outer) && (current_table != function)) {
+		return check_decl(function, value, type);
+	} else if(current_table != outer) {
+		return check_decl(outer, value, type);
+	} else {
+		printf("\nNOT\n");
+		return 0;
+	}
+}*/
 

@@ -4,20 +4,26 @@ int analizeTree(ast_nodeptr node, Table table, char * type){
     int i;
 
     if(!strcmp(node->type,"Program")){
-        Table insert = insert_table(NULL,"Program");
+        Table insert = insert_table("Program");
+        if(insert == NULL) {
+            printf("NULL no program\n");
+        }
         for(i = 0; i < node->nr_children; i++){
             programTree(node->children[i], insert, NULL);
         }
     }
 
     if(!strcmp(node->type, "FuncDecl")) {
-        Table insert = insert_table(NULL, "Function");
+        Table insert = insert_table("Function");
         insert_info(insert,node->children[0]->value,node->children[2]->value,0,"return");
         funcParamsTree(node->children[1], insert,NULL);
     }
 
     if(!strcmp(node->type,"FuncDef")){
-        Table insert=insert_table(NULL,"Function");
+        Table insert=insert_table("Function");
+        if(insert == NULL) {
+            printf("NULL no funcdef\n");
+        }
         insert_info(insert,node->children[0]->value,node->children[2]->value,0,"return");
         funcParamsTree(node->children[1], insert,NULL);
         funcVarTree(node->children[3], insert, NULL);
@@ -32,7 +38,7 @@ int analizeTree(ast_nodeptr node, Table table, char * type){
                 funcVarTree(node->children[i], insert, NULL);
         }
         else
-            insert = insert_table(NULL, "Function");
+            insert = insert_table("Function");
     }
 
     for(i=0;i<node->nr_children;i++){
@@ -41,12 +47,12 @@ int analizeTree(ast_nodeptr node, Table table, char * type){
     return 0;
 }
 
-int programTree(ast_nodeptr node,Table table,char * type){
+int programTree(ast_nodeptr node, Table table,char * type){
     int i;
 
     if(!strcmp(node->type,"VarPart")){
         for(i=0;i<node->nr_children;i++){
-            varDeclTree(node->children[i],table,NULL);
+            varDeclTree(node->children[i], table, NULL);
         }
     }
 
@@ -103,17 +109,47 @@ int funcIdInsert(ast_nodeptr node,Table table,char * type){
 int varDeclTree(ast_nodeptr node,Table table,char * type){
     int i;
     if(!strcmp(node->type,"VarDecl")){
-        for(i=0;i<node->nr_children-1;i++){
-            insertIds(node->children[i],table,node->children[node->nr_children-1]->value);
-        }
+        Info info = get_info(table, node->children[node->nr_children-1]->value);
+        //printf("TYPE: %s - INFO: %s\n", node->children[node->nr_children-1]->value, info->value, info->type, info->constant, info->return_params);
+        //printf("%s\t%s", info->value, info->type);
+        /*if(info->constant==1)
+            printf("\t%s", "constant");
+
+        if(strcmp(info->return_params,""))
+            printf("\t%s",info->return_params);
+
+
+            printf("\n");*/
+
+        if(info != NULL) {
+            //printf("\nvalue:%s-type:%s\n", info->value, info->type);
+            if(strcmp(info->type, "_type_") != 0) {
+                // Erro type expected
+                printf("Type expected\n");
+            } else {
+                for(i=0;i<node->nr_children-1;i++) {
+                    insertIds(node->children[i], table, node->children[node->nr_children-1]->value);
+                }
+            }
+        } else {
+            // Symbol not defined
+            printf("Symbol not defined\n");
+        }   
     }
 
     return 0;
 }
 
-int insertIds(ast_nodeptr node,Table table,char * type){
+int insertIds(ast_nodeptr node, Table table, char * type){
     if(!strcmp(node->type,"Id")){
-        insert_info(table, node->value, type, 0, NULL);
+        if(!exists_decl(table, node->value)) {
+            insert_info(table, node->value, type, 0, NULL);
+        } else {
+            // Duplicated var
+            printf("Duplicated var\n");
+        }
+
+        
     }
 
     return 0;

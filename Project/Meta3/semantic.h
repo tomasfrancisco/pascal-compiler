@@ -9,3 +9,5 @@ int varDeclTree(ast_nodeptr node,Table table,char * type);
 int insertIds(ast_nodeptr node,Table table,char * type);
 int funcIdInsert(ast_nodeptr node,Table table,char * type);
 int funcVarTree(ast_nodeptr node,Table table,char * type);
+int funcParamsTree(ast_nodeptr node,Table table,char * type);
+

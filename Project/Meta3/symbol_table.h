@@ -24,9 +24,12 @@ typedef struct symbols_line {
 } symbols_line;
 
 Table init_semantic_tables();
-Table insert_table(Table semantic_table, char* name);
+Table insert_table(char* name);
 void show_tables(Table semantic_table);
 Info insert_info(Table semantic_table, char* value, char* type, int constant, char* return_params);
 Info search_info(Table semantic_tables, char* value);
 Table search_table(char* value);
 char* to_lower(char* value);
+int check_decl(Table semantic_table, char* value, char* type);
+Info get_info(Table semantic_table, char* value);
+int exists_decl(Table semantic_table, char* value);
