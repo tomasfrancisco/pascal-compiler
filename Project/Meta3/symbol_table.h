@@ -33,4 +33,5 @@ char* to_lower(char* value);
 int check_decl(Table semantic_table, char* value, char* type);
 Info get_info_scope(Table semantic_table, char* value);
 int exists_decl(Table semantic_table, char* value);
-Info get_info_func(Table semantic_table, char* value);
+Info get_info_func(char* value);
+Table get_func_table(char* value);
