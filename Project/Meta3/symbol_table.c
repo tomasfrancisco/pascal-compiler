@@ -139,14 +139,14 @@ Table search_table(char* value) {
 	return NULL;
 }
 
-Info get_info(Table semantic_table, char* value) {
+Info get_info_scope(Table semantic_table, char* value) {
 	value = to_lower(value);
 	Table outer = root_semantic_tables;
 	Table paramcount = root_semantic_tables->next;
 	Table program = root_semantic_tables->next->next;
 
 	if(semantic_table == NULL) {
-		//printf("MERDA NA FUNÇÃO GET_INFO\n");
+		//printf("MERDA NA FUNÇÃO get_info_scope\n");
 		return NULL;
 	}
 
@@ -201,4 +201,30 @@ int exists_decl(Table semantic_table, char* value) {
 			return 1;
 	}
 	return 0;
+}
+
+Info get_info_func(Table semantic_table, char* value) {//Encontra a informação sobre a função de nome value nas tabelas todas.
+
+	value = to_lower(value);
+
+	Table program = root_semantic_tables->next->next;
+
+	if(semantic_table == NULL) {
+		//Começar da primeira tabela a seguir a program (Primeira tabela de funções)
+		semantic_table=program->next;
+	}
+
+	// Function
+	Info current_info;
+	for(semantic_table;semantic_table;semantic_table=semantic_table->next){
+		for(current_info = semantic_table->info; current_info; current_info = current_info->next) {
+			// existe o nó já declarado com o nome value
+			if(strcmp(value, current_info->value) == 0) {
+				return current_info;
+			}
+		}
+	}
+
+
+	return NULL;
 }

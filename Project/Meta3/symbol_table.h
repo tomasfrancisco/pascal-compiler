@@ -31,5 +31,6 @@ Info search_info(Table semantic_tables, char* value);
 Table search_table(char* value);
 char* to_lower(char* value);
 int check_decl(Table semantic_table, char* value, char* type);
-Info get_info(Table semantic_table, char* value);
+Info get_info_scope(Table semantic_table, char* value);
 int exists_decl(Table semantic_table, char* value);
+Info get_info_func(Table semantic_table, char* value);

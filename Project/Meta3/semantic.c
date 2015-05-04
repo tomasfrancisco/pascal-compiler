@@ -52,9 +52,9 @@ int analizeTree(ast_nodeptr node, Table table, char * type){
             insert = insert_table("Function");
     }
 
-    /*if(!strcmp(node->type, "WriteLn")) {
+    if(!strcmp(node->type, "WriteLn")) {
         checkWriteLn(node);
-    }*/
+    }
 
     for(i=0;i<node->nr_children;i++){
         analizeTree(node->children[i],root_semantic_tables,NULL);
@@ -96,7 +96,7 @@ int funcParamsTree(ast_nodeptr node,Table table,char * type){
     int i,j;
     for(i=0;i<node->nr_children;i++){
         if(!strcmp(node->children[i]->type,"Params")){
-            Info info = get_info(table, node->children[i]->children[node->children[i]->nr_children-1]->value);
+            Info info = get_info_scope(table, node->children[i]->children[node->children[i]->nr_children-1]->value);
             if(info != NULL) {
                 //printf("\nvalue:%s-type:%s\n", info->value, info->type);
                 if(strcmp(info->type, "_type_") != 0) {
@@ -115,7 +115,7 @@ int funcParamsTree(ast_nodeptr node,Table table,char * type){
         }
 
         if(!strcmp(node->children[i]->type,"VarParams")){
-            Info info = get_info(table, node->children[i]->children[node->children[i]->nr_children-1]->value);
+            Info info = get_info_scope(table, node->children[i]->children[node->children[i]->nr_children-1]->value);
             if(info != NULL) {
                 //printf("\nvalue:%s-type:%s\n", info->value, info->type);
                 if(strcmp(info->type, "_type_") != 0) {
@@ -155,7 +155,7 @@ int funcIdInsert(ast_nodeptr node,Table table,char * type){
 int varDeclTree(ast_nodeptr node,Table table,char * type){
     int i;
     if(!strcmp(node->type,"VarDecl")){
-        Info info = get_info(table, node->children[node->nr_children-1]->value);
+        Info info = get_info_scope(table, node->children[node->nr_children-1]->value);
         //printf("TYPE: %s - INFO: %s\n", node->children[node->nr_children-1]->value, info->value, info->type, info->constant, info->return_params);
         //printf("%s\t%s", info->value, info->type);
         /*if(info->constant==1)
@@ -194,12 +194,23 @@ void set_error(ast_nodeptr node, char* reason) {
     exit(0);
 }
 
-/*int checkWriteLn(ast_nodeptr node){
+int checkWriteLn(ast_nodeptr node){
     int i;
     for(i=0;i<node->nr_children;i++){
-        if(!strcmp(node->children[i]->value,"Call")){
+
+        if(!strcmp(node->children[i]->type,"Call")){
             //Verificar return type da function que está a ser chamada
-            node->children[i]->children[0]->value;
+            char *funcId=node->children[i]->children[0]->value;
+            if(!exists_decl(root_semantic_tables->next->next,funcId)){
+                char error_reason[128];
+                sprintf(error_reason, "Symbol %s not defined", funcId);
+                set_error(node->children[i]->children[0],error_reason);
+            }else{
+                Info info = get_info_scope(root_semantic_tables->next->next,funcId);
+                if(strcmp(info->type,"_function_")){
+                    set_error(node->children[i]->children[0],"Function identifier expected");
+                }
+            }
         }
     }
-}*/
+}
