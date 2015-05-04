@@ -151,4 +151,3 @@ Table search_table(char* value) {
 	}
 	return NULL;
 }
-

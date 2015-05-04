@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include "ast.h"
 
+
 ast_nodeptr createNode(int line, int column, char *type, char *value ,int superfluo, int nr_children, ...){
 	va_list valist;
 
