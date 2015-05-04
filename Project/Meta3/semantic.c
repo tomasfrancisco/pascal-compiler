@@ -130,7 +130,7 @@ int varDeclTree(ast_nodeptr node,Table table,char * type){
             char error_reason[128];
             sprintf(error_reason, "Symbol %s not defined", node->children[node->nr_children-1]->value);
             set_error(node, error_reason);
-        }   
+        }
     }
 
     return 0;
@@ -149,7 +149,7 @@ int insertIds(ast_nodeptr node, Table table, char * type){
             set_error(node, error_reason);
         }
 
-        
+
     }
 
     return 0;

@@ -53,7 +53,7 @@ Table insert_table(char* name) {
 		root_semantic_tables = new_table;
 	} else {
 		current_table = root_semantic_tables;
-		while(current_table->next != NULL) 
+		while(current_table->next != NULL)
 			current_table = current_table->next;
 		current_table->next = new_table;
 	}
@@ -142,6 +142,7 @@ Table search_table(char* value) {
 Info get_info(Table semantic_table, char* value) {
 	value = to_lower(value);
 	Table outer = root_semantic_tables;
+	Table paramcount = root_semantic_tables->next;
 	Table program = root_semantic_tables->next->next;
 
 	if(semantic_table == NULL) {
@@ -165,7 +166,13 @@ Info get_info(Table semantic_table, char* value) {
 			return current_info;
 		}
 	}
-
+	//Paramcount
+	for(current_info = paramcount->info; current_info; current_info = current_info->next) {
+		// existe o nó já declarado com o nome value
+		if(strcmp(value, current_info->value) == 0) {
+			return current_info;
+		}
+	}
 	// Outer
 	for(current_info = outer->info; current_info; current_info = current_info->next) {
 		// existe o nó já declarado com o nome value
@@ -185,7 +192,7 @@ int exists_decl(Table semantic_table, char* value) {
 		return 0;
 	}
 
-	
+
 	Info current_info;
 	for(current_info = semantic_table->info; current_info; current_info = current_info->next) {
 		if(strcmp(value, current_info->value) == 0)
