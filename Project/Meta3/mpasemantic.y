@@ -180,7 +180,7 @@ int main(int argc, char **argv)
     }
 
     if(((argc > 2 && strcmp(argv[2], "-s")== 0) || (argc > 1 && strcmp(argv[1], "-s")== 0))  && errors == 0) {
-        errors=analizeTree(rootptr,root_semantic_tables,NULL);
+        errors=analizeTree(NULL,rootptr,root_semantic_tables,NULL);
         if(errors==0)
             show_tables(root_semantic_tables);
     }

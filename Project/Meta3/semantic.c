@@ -1,5 +1,4 @@
 #include "semantic.h"
-
 int insertIds(ast_nodeptr node, Table table,char * type,int constant,char * returntype){
     if(!strcmp(node->type,"Id")){
         if(!exists_decl(table, node->value)) {
@@ -17,11 +16,12 @@ int insertIds(ast_nodeptr node, Table table,char * type,int constant,char * retu
     return 0;
 }
 
-int analizeTree(ast_nodeptr node, Table table, char * type){
+int analizeTree(Table current_table,ast_nodeptr node, Table table, char * type){
     int i;
 
     if(!strcmp(node->type,"Program")){
         Table insert = insert_table("Program");
+        current_table= insert;
         for(i = 0; i < node->nr_children; i++){
             programTree(node->children[i], insert, NULL);
         }
@@ -29,12 +29,14 @@ int analizeTree(ast_nodeptr node, Table table, char * type){
 
     if(!strcmp(node->type, "FuncDecl")) {
         Table insert = insert_table("Function");
+        current_table= insert;
         insertIds(node->children[0],insert,node->children[2]->value,0,"return");
         funcParamsTree(node->children[1], insert,NULL);
     }
 
     if(!strcmp(node->type,"FuncDef")){
         Table insert=insert_table("Function");
+        current_table= insert;
         insertIds(node->children[0],insert,node->children[2]->value,0,"return");
         funcParamsTree(node->children[1], insert,NULL);
         funcVarTree(node->children[3], insert, NULL);
@@ -45,6 +47,7 @@ int analizeTree(ast_nodeptr node, Table table, char * type){
     if(!strcmp(node->type, "FuncDef2")) {
         Table insert = search_table(node->children[0]->value);
         if(insert != NULL) {
+            current_table= insert;
             for(i = 0; i < node->nr_children; i++)
                 funcVarTree(node->children[i], insert, NULL);
         }
@@ -53,11 +56,11 @@ int analizeTree(ast_nodeptr node, Table table, char * type){
     }
 
     if(!strcmp(node->type, "WriteLn")) {
-        checkWriteLn(node);
+        checkWriteLn(node,current_table);
     }
 
     for(i=0;i<node->nr_children;i++){
-        analizeTree(node->children[i],root_semantic_tables,NULL);
+        analizeTree(current_table,node->children[i],root_semantic_tables,NULL);
     }
 
     return 0;
@@ -194,21 +197,36 @@ void set_error(ast_nodeptr node, char* reason) {
     exit(0);
 }
 
-int checkWriteLn(ast_nodeptr node){
+int checkWriteLn(ast_nodeptr node,Table current_table){
     int i;
     for(i=0;i<node->nr_children;i++){
 
         if(!strcmp(node->children[i]->type,"Call")){
             //Verificar return type da function que está a ser chamada
-            char *funcId=node->children[i]->children[0]->value;
-            if(!exists_decl(root_semantic_tables->next->next,funcId)){
+            ast_nodeptr funcIdNode=node->children[i]->children[0];
+            if(!exists_decl(root_semantic_tables->next->next,funcIdNode->value)){
                 char error_reason[128];
-                sprintf(error_reason, "Symbol %s not defined", funcId);
-                set_error(node->children[i]->children[0],error_reason);
+                sprintf(error_reason, "Symbol %s not defined", funcIdNode->value);
+                set_error(funcIdNode,error_reason);
             }else{
-                Info info = get_info_scope(root_semantic_tables->next->next,funcId);
+                Info info = get_info_scope(root_semantic_tables->next->next,funcIdNode->value);
                 if(strcmp(info->type,"_function_")){
-                    set_error(node->children[i]->children[0],"Function identifier expected");
+                    set_error(funcIdNode,"Function identifier expected");
+                }
+            }
+        }else if (!strcmp(node->children[i]->type,"Id")){
+            //printf("Table %s: %s\n",current_table->name,current_table->info->value);
+            //printf("Value: %s\n",node->children[i]->value);
+            if(get_info_scope(current_table,node->children[i]->value)==NULL){
+                char error_reason[128];
+                sprintf(error_reason, "Symbol %s not defined", node->children[i]->value);
+                set_error(node->children[i],error_reason);
+            }else{
+                //printf("%s",current_table->name);
+                Info info = get_info_scope(current_table,node->children[i]->value);//Foi criado uma variavel global para guardar em que tabela estamos
+                                                                                   //Ao descer a árvore. Sempre que se insere uma tabela nova, muda-se este valor
+                if(!strcmp(info->type,"_type_")){
+                    set_error(node->children[i],"Cannot write values of type _type_");
                 }
             }
         }
