@@ -400,6 +400,7 @@ Info operation(ast_nodeptr node, Table table) {
         sprintf(error_reason, "Symbol %s not defined", node->value);
         set_error(node, error_reason);
     }
+    return NULL;
 }
 
 Info terminal(ast_nodeptr node, Table table) {
@@ -425,6 +426,7 @@ Info terminal(ast_nodeptr node, Table table) {
         sprintf(info->value, "%s", node->value);
         return info;
     }
+    return NULL;
 }
 
 void varpart(ast_nodeptr node, Table table) {
@@ -594,6 +596,7 @@ Info call(ast_nodeptr node, Table table) {
         sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
         set_error(node->children[0], error_reason);
     }
+    return NULL;
 }
 
 void set_error(ast_nodeptr node, char* reason) {
