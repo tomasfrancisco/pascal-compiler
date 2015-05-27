@@ -131,7 +131,7 @@ Info search_info(Table semantic_tables, char* value) {
 Table search_table(char* value) {
 	Table copy = root_semantic_tables;
 	value = to_lower(value);
-	for(copy; copy; copy = copy->next) {
+	for(; copy; copy = copy->next) {
 		if(strcmp(copy->info->value, value) == 0 && strcmp(copy->info->return_params, "return") == 0) {
 			return copy;
 		}
@@ -146,7 +146,7 @@ Info get_info_scope(Table semantic_table, char* value) {
 	Table program = root_semantic_tables->next->next;
 
 	if(semantic_table == NULL) {
-		//printf("MERDA NA FUNÇÃO get_info_scope\n");
+		printf("MERDA NA FUNÇÃO get_info_scope\n");
 		return NULL;
 	}
 
@@ -203,51 +203,31 @@ int exists_decl(Table semantic_table, char* value) {
 	return 0;
 }
 
-Info get_info_func(Table semantic_table, char* value) {//Encontra a informação sobre a função de nome value nas tabelas todas.
+Info get_info_func(char* value) {//Encontra a informação sobre a função de nome value nas tabelas todas.
 
 	value = to_lower(value);
 
 	Table program = root_semantic_tables->next->next;
-
-	if(semantic_table == NULL) {
-		//Começar da primeira tabela a seguir a program (Primeira tabela de funções)
-		semantic_table=program->next;
-	}
-
-	// Function
-	Info current_info;
-	for(semantic_table;semantic_table;semantic_table=semantic_table->next){
-		for(current_info = semantic_table->info; current_info; current_info = current_info->next) {
-			// existe o nó já declarado com o nome value
-			if(strcmp(value, current_info->value) == 0) {
-				return current_info;
-			}
+	Info info;
+	for(info = program->info; info; info = info->next) {
+		if(!strcmp(info->value, value)) {
+			return info;
 		}
 	}
-
 
 	return NULL;
 }
 
-Table get_func_table(Table semantic_table, char* value) {//Encontra a informação sobre a função de nome value nas tabelas todas.
+Table get_func_table(char* value) {//Encontra a informação sobre a função de nome value nas tabelas todas.
 
 	value = to_lower(value);
 
-	Table program = root_semantic_tables->next->next;
+	Table function = root_semantic_tables->next->next->next;
+	Table current_table;
 
-	if(semantic_table == NULL) {
-		//Começar da primeira tabela a seguir a program (Primeira tabela de funções)
-		semantic_table=program->next;
-	}
-
-	// Function
-	Info current_info;
-	for(semantic_table;semantic_table;semantic_table=semantic_table->next){
-		for(current_info = semantic_table->info; current_info; current_info = current_info->next) {
-			// existe o nó já declarado com o nome value
-			if(strcmp(value, current_info->value) == 0) {
-				return semantic_table;
-			}
+	for(current_table = function; current_table; current_table = current_table->next) {
+		if(!strcmp(current_table->info->value, value)) {
+			return current_table;
 		}
 	}
 
