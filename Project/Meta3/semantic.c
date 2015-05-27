@@ -23,69 +23,409 @@ void program(ast_nodeptr node, Table table) {
             funcpart(node->children[i], table);
     }
     else {
-        other(node, table);
+        for(i = 0; i < node->nr_children; i++)
+            statement(node->children[i], table);
     }
 }
 
-void other(ast_nodeptr node, Table table) {
+void statement(ast_nodeptr node, Table table) {
     int i;
-
+    //printf("node-type: %s\n", node->type);
     if(!strcmp(node->type, "Assign")) {
-        for(i = 0; i < node->nr_children; i++) {
-            assign(node->children[i], table);
-        }
+        assign(node, table);
     }
-
+    
     if(!strcmp(node->type, "IfElse")) {
-        for(i = 0; i < node->nr_children; i++) {
-            ifelse(node->children[i], table);
-        }
+        ifelse(node, table);
     }
-
+    
     if(!strcmp(node->type, "Repeat")) {
+        repeat(node, table);
+    }
+    if(!strcmp(node->type, "StatList")) {
         for(i = 0; i < node->nr_children; i++) {
-            repeat(node->children[i], table);
+            statement(node->children[i], table);
         }
     }
-
+    
     if(!strcmp(node->type, "ValParam")) {
-        valparam(node->children[i], table);
+        valparam(node, table);
     }
 
     if(!strcmp(node->type, "While")) {
-        whiles(node->children[i], table);
+        whiles(node, table);
     }
-
+    
     if(!strcmp(node->type, "WriteLn")) {
-        for(i = 0; i < node->nr_children; i++) {
-            writeln(node->children[i], table);
-        }
+        writeln(node, table);
     }
 }
 
 void assign(ast_nodeptr node, Table table) {
+    //printf("Assign\n");
+    Info first = get_info_scope(table, node->children[0]->value);
 
-    
+    if(first == NULL) {
+        char error_reason[128];
+        sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+        set_error(node->children[0], error_reason);
+    }
+
+    Info second = operation(node->children[1], table);
+
+    if(second == NULL) {
+        char error_reason[128];
+        sprintf(error_reason, "Symbol %s not defined", node->children[1]->value);
+        set_error(node->children[1], error_reason);
+    }
+
+    if(strcmp(first->type, second->type)) {
+        if(!strcmp(first->type, "_real_") && !strcmp(second->type, "_integer_")) {
+           return;
+        }
+        char error_reason[128];
+        sprintf(error_reason, "Incompatible type in assigment to %s (got %s, expected %s)", first->value, second->type, first->type);
+        set_error(node, error_reason);
+    }
 }
 
-void add(ast_nodeptr node, Table table) {
-    
+void ifelse(ast_nodeptr node, Table table) {    
+    Info first = operation(node->children[0], table);
+
+    if(first == NULL) {
+        char error_reason[128];
+        sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+        set_error(node->children[0], error_reason);
+    }
+
+    if(strcmp(first->type, "_boolean_")) {
+        char error_reason[128];
+        sprintf(error_reason, "Incompatible type in %s statement (got %s, expected %s)", node->value, first->type, "_boolean_");
+        set_error(node->children[0], error_reason);
+    }
+
+    statement(node->children[1], table);
+    statement(node->children[2], table);
 }
 
 void repeat(ast_nodeptr node, Table table) {
-    int i;
+    statement(node->children[0], table);
+    Info second = operation(node->children[1], table);
 
-    other(node, table);
-    
+    if(second == NULL) {
+        char error_reason[128];
+        sprintf(error_reason, "Symbol %s not defined", node->children[1]->value);
+        set_error(node->children[1], error_reason);
+    }
+
+    if(strcmp(second->type, "_boolean_")) {
+        char error_reason[128];
+        sprintf(error_reason, "Incompatible type in %s statement (got %s, expected %s)", "repeat-until", second->type, "_boolean_");
+        set_error(node->children[1], error_reason);
+    }
+}
+
+void valparam(ast_nodeptr node, Table table) {
+    Info first = operation(node->children[0], table);
+
+    if(first == NULL) {
+        char error_reason[128];
+        sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+        set_error(node->children[0], error_reason);
+    }
+    Info second = operation(node->children[1], table);
+
+    if(second == NULL) {
+        char error_reason[128];
+        sprintf(error_reason, "Symbol %s not defined", node->children[1]->value);
+        set_error(node->children[1], error_reason);
+    }
 }
 
 void whiles(ast_nodeptr node, Table table) {
-    int i;
+    Info first = operation(node->children[0], table);
 
-    other(node, table);
+    if(first == NULL) {
+        char error_reason[128];
+        sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+        set_error(node->children[0], error_reason);
+    }
+
+    if(strcmp(first->type, "_boolean_")) {
+        char error_reason[128];
+        sprintf(error_reason, "Incompatible type in %s statement (got %s, expected %s)", node->value, first->type, "_boolean_");
+        set_error(node->children[0], error_reason);
+    }
+    statement(node->children[1], table);
 }
 
+void writeln(ast_nodeptr node, Table table) {
+    int i;
 
+    for(i = 0; i < node->nr_children; i++) {
+        Info first = operation(node->children[i], table);
+
+
+        if(first == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[i]->value);
+            set_error(node->children[i], error_reason);
+        }
+
+        if(strcmp(first->type, "_real_")
+        || strcmp(first->type, "_integer_")
+        || strcmp(first->type, "_boolean_")) {
+            char error_reason[128];
+            sprintf(error_reason, "Cannot write values of type %s", first->type);
+            set_error(node->children[i], error_reason);
+        }
+    }
+}
+
+Info operation(ast_nodeptr node, Table table) {
+    Info info = (Info) malloc(sizeof(symbols_line));
+    Info first, second;
+    
+    if(!strcmp(node->type, "Add") 
+    || !strcmp(node->type, "Sub")
+    || !strcmp(node->type, "Mul")) {
+        first = operation(node->children[0], table);
+
+        if(first == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+            set_error(node->children[0], error_reason);
+        }
+
+        second = operation(node->children[1], table);
+
+        if(second == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[1]->value);
+            set_error(node->children[1], error_reason);
+        }
+
+        if((!strcmp(first->type, "_real_") && !strcmp(second->type, "_real_"))
+        || (!strcmp(first->type, "_integer_") && !strcmp(second->type, "_integer_"))) {
+            sprintf(info->type, "%s", first->type);
+            sprintf(info->value, "%s", node->value);
+            return info;
+        }
+        if((!strcmp(first->type, "_integer_") && !strcmp(second->type, "_real_"))
+        || (!strcmp(first->type, "_real_") && !strcmp(second->type, "_integer_"))) {
+            sprintf(info->type, "%s", "_real_");
+            sprintf(info->value, "%s", node->value);
+            return info;
+        }
+
+        char error_reason[128];
+        sprintf(error_reason, "Operator %s cannot be applied to types %s, %s", converter(node->type), first->type, second->type);
+        set_error(node, error_reason);
+    }
+    if(!strcmp(node->type, "Plus")
+    || !strcmp(node->type, "Minus")) {
+        first = operation(node->children[0], table);
+
+        if(first == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+            set_error(node->children[0], error_reason);
+        }
+
+        if(!strcmp(first->type, "_integer_") || !strcmp(first->type, "_real_")) {
+            sprintf(info->type, "%s", first->type);
+            sprintf(info->value, "%s", first->value);
+            return info;
+        }
+
+        char error_reason[128];
+        sprintf(error_reason, "Operator %s cannot be applied to type %s", converter(node->type), first->type);
+        set_error(node, error_reason);
+    }
+    if(!strcmp(node->type, "RealDiv")) {
+        first = operation(node->children[0], table);
+
+        if(first == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+            set_error(node->children[0], error_reason);
+        }
+
+        second = operation(node->children[1], table);
+
+        if(second == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[1]->value);
+            set_error(node->children[1], error_reason);
+        }
+
+        if((!strcmp(first->type, "_real_") && !strcmp(second->type, "_real_"))
+        || (!strcmp(first->type, "_integer_") && !strcmp(second->type, "_integer_"))
+        || (!strcmp(first->type, "_integer_") && !strcmp(second->type, "_real_"))
+        || (!strcmp(first->type, "_real_") && !strcmp(second->type, "_integer_"))) {
+            sprintf(info->type, "%s", "_real_");
+            sprintf(info->value, "%s", node->value);
+            return info;
+        }
+
+        char error_reason[128];
+        sprintf(error_reason, "Operator %s cannot be applied to types %s, %s", converter(node->type), first->type, second->type);
+        set_error(node, error_reason);
+    }
+    if(!strcmp(node->type, "And")
+    || !strcmp(node->type, "Or")) {
+        first = operation(node->children[0], table);
+
+        if(first == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+            set_error(node->children[0], error_reason);
+        }    
+
+        second = operation(node->children[1], table);
+
+        if(second == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[1]->value);
+            set_error(node->children[1], error_reason);
+        }
+
+        if(!strcmp(first->type, "_boolean_") && !strcmp(second->type, "_boolean_")) {
+            sprintf(info->type, "%s", first->type);
+            sprintf(info->value, "%s", node->value);
+            return info;
+        }
+
+        char error_reason[128];
+        sprintf(error_reason, "Operator %s cannot be applied to types %s, %s", converter(node->value), first->type, second->type);
+        set_error(node, error_reason);
+    }
+    if(!strcmp(node->type, "Div") 
+    || !strcmp(node->type, "Mod")) {
+        first = operation(node->children[0], table);
+
+        if(first == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+            set_error(node->children[0], error_reason);
+        }
+
+        second = operation(node->children[1], table);
+
+        if(second == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[1]->value);
+            set_error(node->children[1], error_reason);
+        }
+
+        if(!strcmp(first->type, "_integer_") && !strcmp(second->type, "_integer_")) {
+            sprintf(info->type, "%s", first->type);
+            sprintf(info->value, "%s", node->value);
+            return info;
+        }
+
+        char error_reason[128];
+        sprintf(error_reason, "Operator %s cannot be applied to types %s, %s", converter(node->value), first->type, second->type);
+        set_error(node, error_reason);
+    }
+    if(!strcmp(node->type, "Not")) {
+        first = operation(node->children[0], table);
+
+        if(first == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+            set_error(node->children[0], error_reason);
+        }
+        
+        if(!strcmp(first->type, "_boolean_")) {
+            sprintf(info->type, "%s", first->type);
+            sprintf(info->value, "%s", node->value);
+            return info;
+        }
+
+        char error_reason[128];
+        sprintf(error_reason, "Operator %s cannot be applied to types %s, %s", converter(node->value), first->type, second->type);
+        set_error(node, error_reason);
+    }
+    if(!strcmp(node->type, "Eq")
+    || !strcmp(node->type, "Gt")
+    || !strcmp(node->type, "Geq")
+    || !strcmp(node->type, "Leq")
+    || !strcmp(node->type, "Lt")
+    || !strcmp(node->type, "Neq")) {
+        first = operation(node->children[0], table);
+
+        if(first == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+            set_error(node->children[0], error_reason);
+        }
+
+        second = operation(node->children[1], table);
+
+        if(second == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[1]->value);
+            set_error(node->children[1], error_reason);
+        }
+
+        if((!strcmp(first->type, "_boolean_") && !strcmp(second->type, "_boolean_"))
+        || (!strcmp(first->type, "_real_") && !strcmp(second->type, "_real_"))
+        || (!strcmp(first->type, "_integer_") && !strcmp(second->type, "_integer_"))) {
+            sprintf(info->type, "%s", "_boolean_");
+            sprintf(info->value, "%s", node->value);
+            return info;
+        }
+
+        char error_reason[128];
+        sprintf(error_reason, "Operator %s cannot be applied to types %s, %s", converter(node->type), first->type, second->type);
+        set_error(node, error_reason);
+    }
+    if(!strcmp(node->type, "Call")) {
+        Info first = call(node, table);
+
+        if(first == NULL) {
+            char error_reason[128];
+            sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+            set_error(node->children[0], error_reason);
+        }
+    }
+
+    Info term = terminal(node, table);
+    if(term != NULL) {
+        return term;
+    }
+    else {
+        char error_reason[128];
+        sprintf(error_reason, "Symbol %s not defined", node->value);
+        set_error(node, error_reason);
+    }
+}
+
+Info terminal(ast_nodeptr node, Table table) {
+    Info info = (Info) malloc(sizeof(symbols_line));
+
+    if(!strcmp(node->type, "Id")) {
+        info = get_info_scope(table, node->value);
+        //printf("INFO: value %s type %s\n", info->value, info->type);
+        return info;
+    }
+    if(!strcmp(node->type, "IntLit")) {
+        sprintf(info->type, "_integer_");
+        sprintf(info->value, "%s", node->value);
+        return info;
+    }
+    if(!strcmp(node->type, "RealLit")) {
+        sprintf(info->type, "_real_");
+        sprintf(info->value, "%s", node->value);
+        return info;
+    }
+    if(!strcmp(node->type, "String")) {
+        sprintf(info->type, "String");
+        sprintf(info->value, "%s", node->value);
+        return info;
+    }
+}
 
 void varpart(ast_nodeptr node, Table table) {
     int i;
@@ -202,6 +542,8 @@ void funcdef(ast_nodeptr node, Table table) {
     
     for(i = 0; i < node->children[3]->nr_children; i++)
         varpart(node->children[3]->children[i], insert);
+    //printf("Statement\n");
+    statement(node->children[4], insert);
 }
 
 void funcdef2(ast_nodeptr node, Table table) {
@@ -209,50 +551,18 @@ void funcdef2(ast_nodeptr node, Table table) {
 
     Table insert = search_table(node->children[0]->value);
     if(insert == NULL) {
-        insert = insert_table("Function");
+        char error_reason[128];
+        sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+        set_error(node->children[0], error_reason);
     }
 
     for(i = 0; i < node->children[1]->nr_children; i++)
         varpart(node->children[1]->children[i], insert);
+
+    statement(node->children[2], insert);
 }
 
-void ifelse(ast_nodeptr node, Table table) {
-    int i; 
-
-    if(!strcmp(node->type, "StatList")) {
-        for(i = 0; i < node->nr_children; i++) {
-            statlist(node->children[i], table);
-        }
-    }
-}
-
-void statlist(ast_nodeptr node, Table table) {
-    int i;
-
-    if(!strcmp(node->type, "WriteLn")) {
-        for(i = 0; i < node->nr_children; i++) {
-            writeln(node->children[i], table);
-        }
-    }
-    if(!strcmp(node->type, "ValParam")) {
-        valparam(node, table);
-    }
-}
-
-void writeln(ast_nodeptr node, Table table) {
-    int i;
-
-    if(!strcmp(node->type, "Call")) {
-        call(node, table);
-    }
-}
-
-//TODO
-void valparam(ast_nodeptr node, Table table) {
-
-}
-
-void call(ast_nodeptr node, Table table) {
+Info call(ast_nodeptr node, Table table) {
     Table func_table;
     Info info = get_info_func(node->children[0]->value);
   
@@ -275,15 +585,69 @@ void call(ast_nodeptr node, Table table) {
             sprintf(error_reason, "Wrong number of arguments in call to function %s (got %d, expected %d)", node->children[0]->value, node->nr_children-1, n_arguments);
             set_error(node->children[0],error_reason);
         }
+        else {
+            return info;
+        }
     } else {
         // Symbol not defined
         char error_reason[128];
-        sprintf(error_reason, "Symbol %s not defined", node->children[node->nr_children-1]->value);
-        set_error(node, error_reason);
+        sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
+        set_error(node->children[0], error_reason);
     }
 }
 
 void set_error(ast_nodeptr node, char* reason) {
     printf("Line %d, col %d: %s\n", node->line, node->column, reason);
     exit(0);
+}
+
+char* converter(char* type) {
+    sprintf(return_type, "%s", type);
+    if(!strcmp(type, "Add")) {
+        sprintf(return_type, "+");
+    }
+    if(!strcmp(type, "Eq")) {
+        sprintf(return_type, "=");
+    }
+    if(!strcmp(type, "Geq")) {
+        sprintf(return_type, ">=");
+    }
+    if(!strcmp(type, "Gt")) {
+        sprintf(return_type, ">");
+    }
+    if(!strcmp(type, "Leq")) {
+        sprintf(return_type, "<=");
+    }
+    if(!strcmp(type, "Lt")) {
+        sprintf(return_type, "<");
+    }
+    if(!strcmp(type, "Minus")) {
+        sprintf(return_type, "-");
+    }
+    if(!strcmp(type, "Mul")) {
+        sprintf(return_type, "*");
+    }
+    if(!strcmp(type, "Neq")) {
+        sprintf(return_type, "<>");
+    }
+    if(!strcmp(type, "Plus")) {
+        sprintf(return_type, "+");
+    }
+    if(!strcmp(type, "RealDiv")) {
+        sprintf(return_type, "/");
+    }
+    if(!strcmp(type, "Sub")) {
+        sprintf(return_type, "-");
+    }
+    // Variable Types
+    if(!strcmp(type, "IntLit")) {
+        sprintf(return_type, "_integer_");
+    }
+    if(!strcmp(type, "RealLit")) {
+        sprintf(return_type, "_real_");
+    }
+    if(!strcmp(type, "String")) {
+        sprintf(return_type, "String");
+    }
+    return return_type;
 }

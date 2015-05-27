@@ -131,7 +131,7 @@ Info search_info(Table semantic_tables, char* value) {
 Table search_table(char* value) {
 	Table copy = root_semantic_tables;
 	value = to_lower(value);
-	for(copy; copy; copy = copy->next) {
+	for(; copy; copy = copy->next) {
 		if(strcmp(copy->info->value, value) == 0 && strcmp(copy->info->return_params, "return") == 0) {
 			return copy;
 		}

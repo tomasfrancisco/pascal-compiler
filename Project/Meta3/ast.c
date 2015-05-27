@@ -101,7 +101,17 @@ int printTree(ast_nodeptr node,int treedepth){
 	}
 	printf("%s",node->type);
 	if(node->value!=NULL && (strcmp(node->type,"StatList"))){
-		printf("(%s)",node->value);
+		if(!strcmp(node->type, "And")
+		|| !strcmp(node->type, "Div")
+		|| !strcmp(node->type, "Or")
+		|| !strcmp(node->type, "Mod")
+		|| !strcmp(node->type, "Not")
+		|| !strcmp(node->type, "IfElse")) {
+
+		}
+		else {
+			printf("(%s)",node->value);
+		}
 	}
 	//printf(" Line:%d Column:%d",node->line,node->column);
 	printf("\n");
