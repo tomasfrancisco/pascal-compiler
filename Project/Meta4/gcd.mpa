@@ -1,0 +1,7 @@
+program  gcd (output);
+    var      a, b, c : integer;
+            z : real;
+            t: boolean;
+    begin
+            a := t;
+    end.
