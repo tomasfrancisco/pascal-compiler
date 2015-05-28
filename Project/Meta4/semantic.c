@@ -23,8 +23,8 @@ void program(ast_nodeptr node, Table table) {
             funcpart(node->children[i], table);
     }
     else {
-        for(i = 0; i < node->nr_children; i++)
-            statement(node->children[i], table);
+        for(i = 0; i < node->nr_children; i++);
+            //statement(node->children[i], table);
     }
 }
 
@@ -400,6 +400,7 @@ Info operation(ast_nodeptr node, Table table) {
         sprintf(error_reason, "Symbol %s not defined", node->value);
         set_error(node, error_reason);
     }
+    return NULL;
 }
 
 Info terminal(ast_nodeptr node, Table table) {
@@ -425,6 +426,7 @@ Info terminal(ast_nodeptr node, Table table) {
         sprintf(info->value, "%s", node->value);
         return info;
     }
+    return NULL;
 }
 
 void varpart(ast_nodeptr node, Table table) {
@@ -543,7 +545,7 @@ void funcdef(ast_nodeptr node, Table table) {
     for(i = 0; i < node->children[3]->nr_children; i++)
         varpart(node->children[3]->children[i], insert);
     //printf("Statement\n");
-    statement(node->children[4], insert);
+    //statement(node->children[4], insert);
 }
 
 void funcdef2(ast_nodeptr node, Table table) {
@@ -559,7 +561,7 @@ void funcdef2(ast_nodeptr node, Table table) {
     for(i = 0; i < node->children[1]->nr_children; i++)
         varpart(node->children[1]->children[i], insert);
 
-    statement(node->children[2], insert);
+    //statement(node->children[2], insert);
 }
 
 Info call(ast_nodeptr node, Table table) {
@@ -594,6 +596,7 @@ Info call(ast_nodeptr node, Table table) {
         sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
         set_error(node->children[0], error_reason);
     }
+    return NULL;
 }
 
 void set_error(ast_nodeptr node, char* reason) {

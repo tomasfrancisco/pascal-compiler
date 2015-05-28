@@ -18,6 +18,8 @@
 
     ast_nodeptr rootptr;
 
+    void compiler(ast_nodeptr tree, Table table);
+
 %}
 
 
@@ -193,6 +195,10 @@ int main(int argc, char **argv)
     if(((argc > 2 && strcmp(argv[2], "-s")== 0) || (argc > 1 && strcmp(argv[1], "-s")== 0))  && errors == 0) {
         analize(rootptr,root_semantic_tables);
         show_tables(root_semantic_tables);
+    }
+
+    if(argc > 1 && !strcmp(argv[1], "-s")) {
+        compiler(rootptr, root_semantic_tables);
     }
     return 0;
 }
