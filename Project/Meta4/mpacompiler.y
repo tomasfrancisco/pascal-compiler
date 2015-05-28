@@ -197,7 +197,7 @@ int main(int argc, char **argv)
         show_tables(root_semantic_tables);
     }
 
-    if(argc > 1 && !strcmp(argv[1], "-s")) {
+    if(argc > 1 && !strcmp(argv[1], "-t") && !strcmp(argv[2], "-s")) {
         compiler(rootptr, root_semantic_tables);
     }
     return 0;
