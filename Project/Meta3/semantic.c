@@ -23,8 +23,7 @@ void program(ast_nodeptr node, Table table) {
             funcpart(node->children[i], table);
     }
     else {
-        for(i = 0; i < node->nr_children; i++)
-            statement(node->children[i], table);
+        statement(node, table);
     }
 }
 
@@ -69,6 +68,12 @@ void assign(ast_nodeptr node, Table table) {
         char error_reason[128];
         sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
         set_error(node->children[0], error_reason);
+    }
+    //printf("first: %s\n", first->type);
+    if(!strcmp(first->type, "_type_")) {
+        char error_reason[128];
+        sprintf(error_reason, "Variable identifier expected");
+        set_error(node, error_reason);
     }
 
     Info second = operation(node->children[1], table);
@@ -133,6 +138,13 @@ void valparam(ast_nodeptr node, Table table) {
         sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
         set_error(node->children[0], error_reason);
     }
+    if(strcmp(first->type, "_integer_")) {
+        
+        char error_reason[128];
+        sprintf(error_reason, "Incompatible type for argument 1 in call to function val (got %s, expected _integer_)", first->type);
+        set_error(node->children[1], error_reason);
+    }
+
     Info second = operation(node->children[1], table);
 
     if(second == NULL) {
@@ -174,7 +186,8 @@ void writeln(ast_nodeptr node, Table table) {
 
         if(strcmp(first->type, "_real_")
         || strcmp(first->type, "_integer_")
-        || strcmp(first->type, "_boolean_")) {
+        || strcmp(first->type, "_boolean_")
+        || strcmp(first->type, "String")) {
             char error_reason[128];
             sprintf(error_reason, "Cannot write values of type %s", first->type);
             set_error(node->children[i], error_reason);
