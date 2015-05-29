@@ -140,7 +140,7 @@ ast_nodeptr get_func_def(ast_nodeptr tree, char* id) {
 					func_id = funcpart_node->children[i]->children[0];
 
 					if(!strcmp(func_id->value, id)) {
-						return funcpart_node->children[i];
+						return funcpart_node->children[i]; //Devolve o nó da função correspondente a id
 					}
 				}
 			}

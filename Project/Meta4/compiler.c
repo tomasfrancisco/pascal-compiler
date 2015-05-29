@@ -15,41 +15,37 @@ void compiler(ast_nodeptr tree, Table table) {
 void global_variables(Table table) {
 	Table outer = table;
 	Table function = outer->next;
-	Table program = NULL;
+	Table program = outer->next->next;
 	int i;
-	
-	if(function != NULL) {
-		if((program = function->next) != NULL) {
-			Info program_table_ptr = program->info;
-			while(program_table_ptr != NULL) {
-				if(!strcmp(program_table_ptr->type, "_integer_")
-				|| !strcmp(program_table_ptr->type, "_boolean_")
-				|| !strcmp(program_table_ptr->type, "_real_")) {
-					printf("@%s = common global %s 0, align %d\n", program_table_ptr->value, type_converter(program_table_ptr->type), type_assign(program_table_ptr->type));
-				}
-				program_table_ptr = program_table_ptr->next;
+
+	if(program != NULL) {
+		Info program_table_ptr = program->info;
+		while(program_table_ptr != NULL) {
+			if(!strcmp(program_table_ptr->type, "_integer_")
+			|| !strcmp(program_table_ptr->type, "_boolean_")
+			|| !strcmp(program_table_ptr->type, "_real_")) {
+				printf("@%s = common global %s 0, align %d\n", program_table_ptr->value, type_converter(program_table_ptr->type), type_assign(program_table_ptr->type));
 			}
-			
+			program_table_ptr = program_table_ptr->next;
 		}
+
 	}
 }
 
 void functions(ast_nodeptr tree, Table table) {
 	Table outer = table;
 	Table function = outer->next;
-	Table program = NULL;
+	Table program = outer->next->next;
 
-	if(function != NULL) {
-		if((program = function->next) != NULL) {
-			Info program_table_ptr = program->info;
-			while(program_table_ptr != NULL) {
-				if(!strcmp(program_table_ptr->type, "_function_")) {
-					Table func_table = get_func_table(program_table_ptr->value);
-					if(func_table != NULL)
-						func_declaration(tree, func_table);
-				}
-				program_table_ptr = program_table_ptr->next;
+	if(program != NULL) {
+		Info program_table_ptr = program->info;
+		while(program_table_ptr != NULL) {
+			if(!strcmp(program_table_ptr->type, "_function_")) {
+				Table func_table = get_func_table(program_table_ptr->value);
+				if(func_table != NULL)
+					func_declaration(tree, func_table);
 			}
+			program_table_ptr = program_table_ptr->next;
 		}
 	}
 }
@@ -65,10 +61,10 @@ void func_declaration(ast_nodeptr tree, Table func_table) {
 			if(func != NULL)
 				printf("define");
 			else
-				printf("declare");
+				printf("declare"); //este caso alguma vez acontece? 
 
 			printf(" %s @%s(", type_converter(func_variables->type), func_variables->value);
-			func_variables = func_variables->next;	
+			func_variables = func_variables->next;
 
 			while(func_variables != NULL) {
 				if(!strcmp(func_variables->return_params, "param")) {

@@ -154,7 +154,7 @@ Sign:                   '-'                                                 {$$=
 Term:					Term Operator Factor								{$$=createNode(((ast_nodeptr)$2)->line,((ast_nodeptr)$2)->column,((ast_nodeptr)$2)->type,((ast_nodeptr)$2)->value, 0, 2, $1, $3);}
                     |	Factor												{$$=createNode(line,col - ((int)strlen(yytext) - 1),"Factor",NULL, 1, 1, $1);}
 
-Operator:               '/'                                                 {$$=createNode(line,col - ((int)strlen(yytext) - 1),"RealDiv",NULL, 0, 0);}             
+Operator:               '/'                                                 {$$=createNode(line,col - ((int)strlen(yytext) - 1),"RealDiv",NULL, 0, 0);}
                     |   '*'                                                 {$$=createNode(line,col - ((int)strlen(yytext) - 1),"Mul",NULL, 0, 0);}
                     |   AND                                                 {$$=createNode(line,col - ((int)strlen(yytext) - 1),"And",yytext, 0, 0);}
                     |   DIV                                                 {$$=createNode(line,col - ((int)strlen(yytext) - 1),"Div",yytext, 0, 0);}
@@ -187,7 +187,7 @@ int main(int argc, char **argv)
 {
     init_semantic_tables();
     yyparse();
-    if(argc > 1 && strcmp(argv[1], "-t") == 0 && errors == 0) {
+    if(((argc > 2 && strcmp(argv[2], "-t")== 0) || (argc > 1 && strcmp(argv[1], "-t")== 0))  && errors == 0) {
        printTree(rootptr,0);
        printf("\n");
     }
@@ -197,7 +197,7 @@ int main(int argc, char **argv)
         show_tables(root_semantic_tables);
     }
 
-    if(argc > 1 && !strcmp(argv[1], "-t") && !strcmp(argv[2], "-s")) {
+    if(!errors) {
         compiler(rootptr, root_semantic_tables);
     }
     return 0;
