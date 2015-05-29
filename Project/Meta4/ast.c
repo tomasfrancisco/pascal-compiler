@@ -133,13 +133,13 @@ ast_nodeptr get_func_def(ast_nodeptr tree, char* id) {
 
 	if(tree != NULL) {
 		if((funcpart_node = tree->children[2]) != NULL) {	//FuncPart
-			
+
 			for(i = 0; i < funcpart_node->nr_children; i++) {
 				if(!strcmp(funcpart_node->children[i]->type, "FuncDef")
 				|| !strcmp(funcpart_node->children[i]->type, "FuncDef2")) {
-					func_id = funcpart_node->children[i]->children[0]->value;
-				
-					if(!strcmp(func_id, id)) {
+					func_id = funcpart_node->children[i]->children[0];
+
+					if(!strcmp(func_id->value, id)) {
 						return funcpart_node->children[i];
 					}
 				}
