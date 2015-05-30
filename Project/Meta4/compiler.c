@@ -10,6 +10,7 @@ void compiler(ast_nodeptr tree, Table table) {
 	global_variables(table);
 	printf("\n");
 	functions(tree, table);
+	main_function(tree, table);
 }
 
 void global_variables(Table table) {
@@ -79,11 +80,63 @@ void func_declaration(ast_nodeptr tree, Table func_table) {
 			}
 			printf(")");
 
-			if(func != NULL)
+			if(func != NULL) {
 				printf(" {\n");
+				func_definition(func, func_table);
+			}
 			else {
 				printf("\n");
 			}
+		}
+	}
+}
+
+void func_definition(ast_nodeptr func_def, Table table) {
+	Info func_params = table->info;
+	int counter = 0;
+
+	// alloc
+	while(func_params != NULL) {
+		if(!strcmp(func_params->return_params, "param")
+		|| !strcmp(func_params->return_params, "return")) {
+			printf("\t%%%d = alloca %s, align %d\n", ++counter, type_converter(func_params->type), type_assign(func_params->type));
+		}
+		if(!strcmp(func_params->return_params, "")) {
+			printf("\t%%%s = alloca %s, align %d\n", func_params->value, type_converter(func_params->type), type_assign(func_params->type));
+		}
+		func_params = func_params->next;
+	}
+	counter = 1;
+	func_params = table->info;
+	// store
+	while(func_params != NULL) {
+		if(!strcmp(func_params->return_params, "param")) {
+			printf("\tstore %s %%%s, %s* %%%d, align %d\n", type_converter(func_params->type), func_params->value, type_converter(func_params->type), ++counter, type_assign(func_params->type));
+		}
+		func_params = func_params->next;
+	}
+	printf("}\n");
+}
+
+void main_function(ast_nodeptr tree, Table table) {
+	int i, counter = 0;
+	ast_nodeptr prog_statlist = tree->children[3];
+
+	printf("define void @main(i32 %%argc, i8** %%argv) {\n");
+	printf("\t%%1 = alloca i32, align 4\n");
+  	printf("\t%%2 = alloca i8**, align 8\n");
+  	printf("\tstore i32 %%argc, i32* %%1, align 4\n");
+  	printf("\tstore i8** %%argv, i8*** %%2, align 8\n");
+
+	counter = 2;
+	//printf("Type: %s\n", prog_statlist->type);
+	for(i = 0; i < prog_statlist->nr_children; i++) {
+		//printf("Type: %s\n", prog_statlist->children[i]->type);
+		if(!strcmp(prog_statlist->children[i]->type, "ValParam")) {
+			printf("\t%%%d = load i8*** %%2, align 8\n", ++counter);
+			printf("\t%%%d = getelementptr inbounds i8** %%%d, i64 %d\n", ++counter, counter - 1, atoi(prog_statlist->children[i]->children[0]->value) - 1);
+  			printf("\t%%%d = load i8** %%%d, align 8\n", ++counter, counter - 1);
+  			printf("\tstore i8* %%%d, i8** @%s, align 8\n", counter, prog_statlist->children[i]->children[1]->value);
 		}
 	}
 }
