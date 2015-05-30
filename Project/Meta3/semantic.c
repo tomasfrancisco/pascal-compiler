@@ -64,16 +64,19 @@ void assign(ast_nodeptr node, Table table) {
     //printf("Assign\n");
     Info first = get_info_scope(table, node->children[0]->value);
 
+    //printf("assign: %s, first: %s\n", table->name, first->type);
+
     if(first == NULL) {
         char error_reason[128];
         sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
         set_error(node->children[0], error_reason);
     }
     //printf("first: %s\n", first->type);
-    if(!strcmp(first->type, "_type_")) {
+    if(!strcmp(first->type, "_type_") 
+    ||(!strcmp(table->name, "Program") && !strcmp(first->type, "_function_"))) {
         char error_reason[128];
         sprintf(error_reason, "Variable identifier expected");
-        set_error(node, error_reason);
+        set_error(node->children[0], error_reason);
     }
 
     Info second = operation(node->children[1], table);
@@ -83,7 +86,6 @@ void assign(ast_nodeptr node, Table table) {
         sprintf(error_reason, "Symbol %s not defined", node->children[1]->value);
         set_error(node->children[1], error_reason);
     }
-
     if(strcmp(first->type, second->type)) {
         if(!strcmp(first->type, "_real_") && !strcmp(second->type, "_integer_")) {
            return;
@@ -93,6 +95,9 @@ void assign(ast_nodeptr node, Table table) {
         set_error(node, error_reason);
     }
 }
+
+
+
 
 void ifelse(ast_nodeptr node, Table table) {    
     Info first = operation(node->children[0], table);
@@ -104,11 +109,11 @@ void ifelse(ast_nodeptr node, Table table) {
     }
 
     if(strcmp(first->type, "_boolean_")) {
+        //printf("ifelse first %s\n", first->type);
         char error_reason[128];
         sprintf(error_reason, "Incompatible type in %s statement (got %s, expected %s)", node->value, first->type, "_boolean_");
         set_error(node->children[0], error_reason);
     }
-
     statement(node->children[1], table);
     statement(node->children[2], table);
 }
@@ -141,8 +146,8 @@ void valparam(ast_nodeptr node, Table table) {
     if(strcmp(first->type, "_integer_")) {
         
         char error_reason[128];
-        sprintf(error_reason, "Incompatible type for argument 1 in call to function val (got %s, expected _integer_)", first->type);
-        set_error(node->children[1], error_reason);
+        sprintf(error_reason, "Incompatible type in val-paramstr statement (got %s, expected _integer_)", first->type);
+        set_error(node->children[0], error_reason);
     }
 
     Info second = operation(node->children[1], table);
@@ -150,6 +155,13 @@ void valparam(ast_nodeptr node, Table table) {
     if(second == NULL) {
         char error_reason[128];
         sprintf(error_reason, "Symbol %s not defined", node->children[1]->value);
+        set_error(node->children[1], error_reason);
+    }
+
+    if(strcmp(second->type, "_integer_")) {
+        
+        char error_reason[128];
+        sprintf(error_reason, "Incompatible type in val-paramstr statement (got %s, expected _integer_)", second->type);
         set_error(node->children[1], error_reason);
     }
 }
@@ -183,11 +195,10 @@ void writeln(ast_nodeptr node, Table table) {
             sprintf(error_reason, "Symbol %s not defined", node->children[i]->value);
             set_error(node->children[i], error_reason);
         }
-
         if(strcmp(first->type, "_real_")
-        || strcmp(first->type, "_integer_")
-        || strcmp(first->type, "_boolean_")
-        || strcmp(first->type, "String")) {
+        && strcmp(first->type, "_integer_")
+        && strcmp(first->type, "_boolean_")
+        && strcmp(first->type, "String")) {
             char error_reason[128];
             sprintf(error_reason, "Cannot write values of type %s", first->type);
             set_error(node->children[i], error_reason);
@@ -198,6 +209,8 @@ void writeln(ast_nodeptr node, Table table) {
 Info operation(ast_nodeptr node, Table table) {
     Info info = (Info) malloc(sizeof(symbols_line));
     Info first, second;
+
+    //printf("%s\n", node->type);
     
     if(!strcmp(node->type, "Add") 
     || !strcmp(node->type, "Sub")
@@ -221,13 +234,13 @@ Info operation(ast_nodeptr node, Table table) {
         if((!strcmp(first->type, "_real_") && !strcmp(second->type, "_real_"))
         || (!strcmp(first->type, "_integer_") && !strcmp(second->type, "_integer_"))) {
             sprintf(info->type, "%s", first->type);
-            sprintf(info->value, "%s", node->value);
+            sprintf(info->value, "%s", first->value);
             return info;
         }
         if((!strcmp(first->type, "_integer_") && !strcmp(second->type, "_real_"))
         || (!strcmp(first->type, "_real_") && !strcmp(second->type, "_integer_"))) {
             sprintf(info->type, "%s", "_real_");
-            sprintf(info->value, "%s", node->value);
+            sprintf(info->value, "%s", first->value);
             return info;
         }
 
@@ -277,7 +290,7 @@ Info operation(ast_nodeptr node, Table table) {
         || (!strcmp(first->type, "_integer_") && !strcmp(second->type, "_real_"))
         || (!strcmp(first->type, "_real_") && !strcmp(second->type, "_integer_"))) {
             sprintf(info->type, "%s", "_real_");
-            sprintf(info->value, "%s", node->value);
+            sprintf(info->value, "%s", first->value);
             return info;
         }
 
@@ -305,7 +318,7 @@ Info operation(ast_nodeptr node, Table table) {
 
         if(!strcmp(first->type, "_boolean_") && !strcmp(second->type, "_boolean_")) {
             sprintf(info->type, "%s", first->type);
-            sprintf(info->value, "%s", node->value);
+            sprintf(info->value, "%s", first->value);
             return info;
         }
 
@@ -333,7 +346,7 @@ Info operation(ast_nodeptr node, Table table) {
 
         if(!strcmp(first->type, "_integer_") && !strcmp(second->type, "_integer_")) {
             sprintf(info->type, "%s", first->type);
-            sprintf(info->value, "%s", node->value);
+            sprintf(info->value, "%s", first->value);
             return info;
         }
 
@@ -351,10 +364,13 @@ Info operation(ast_nodeptr node, Table table) {
         }
         
         if(!strcmp(first->type, "_boolean_")) {
+            //printf("return not\n");
             sprintf(info->type, "%s", first->type);
-            sprintf(info->value, "%s", node->value);
+            sprintf(info->value, "%s", first->value);
             return info;
         }
+
+        //printf("not: %s\n", first->type);
 
         char error_reason[128];
         sprintf(error_reason, "Operator %s cannot be applied to types %s, %s", converter(node->value), first->type, second->type);
@@ -386,7 +402,7 @@ Info operation(ast_nodeptr node, Table table) {
         || (!strcmp(first->type, "_real_") && !strcmp(second->type, "_real_"))
         || (!strcmp(first->type, "_integer_") && !strcmp(second->type, "_integer_"))) {
             sprintf(info->type, "%s", "_boolean_");
-            sprintf(info->value, "%s", node->value);
+            sprintf(info->value, "%s", first->value);
             return info;
         }
 
@@ -402,8 +418,9 @@ Info operation(ast_nodeptr node, Table table) {
             sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
             set_error(node->children[0], error_reason);
         }
+        return first;
     }
-
+    //printf("id: %s\n", node->type);
     Info term = terminal(node, table);
     if(term != NULL) {
         return term;
@@ -579,6 +596,7 @@ void funcdef2(ast_nodeptr node, Table table) {
 
 Info call(ast_nodeptr node, Table table) {
     Table func_table;
+    Info info_func_table;
     Info info = get_info_func(node->children[0]->value);
   
     if(info != NULL) {
@@ -586,12 +604,12 @@ Info call(ast_nodeptr node, Table table) {
 
         func_table = get_func_table(node->children[0]->value);
 
-        info = func_table->info;
+        info_func_table = func_table->info;
 
-        while(info != NULL) {
-            if(!strcmp(info->return_params,"param") || !strcmp(info->return_params,"varparam"))
+        while(info_func_table != NULL) {
+            if(!strcmp(info_func_table->return_params,"param") || !strcmp(info_func_table->return_params,"varparam"))
                 n_arguments++;
-            info = info->next;
+            info_func_table = info_func_table->next;
         }
        
         if(n_arguments != node->nr_children - 1){
@@ -601,7 +619,7 @@ Info call(ast_nodeptr node, Table table) {
             set_error(node->children[0],error_reason);
         }
         else {
-            return info;
+            return func_table->info;
         }
     } else {
         // Symbol not defined
@@ -609,7 +627,7 @@ Info call(ast_nodeptr node, Table table) {
         sprintf(error_reason, "Symbol %s not defined", node->children[0]->value);
         set_error(node->children[0], error_reason);
     }
-    return NULL;
+    return info;
 }
 
 void set_error(ast_nodeptr node, char* reason) {
