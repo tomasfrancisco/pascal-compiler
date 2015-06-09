@@ -92,7 +92,7 @@ void assign(ast_nodeptr node, Table table) {
         }
         char error_reason[128];
         sprintf(error_reason, "Incompatible type in assigment to %s (got %s, expected %s)", first->value, second->type, first->type);
-        set_error(node, error_reason);
+        set_error(node->children[1], error_reason);
     }
 }
 
@@ -398,8 +398,7 @@ Info operation(ast_nodeptr node, Table table) {
             set_error(node->children[1], error_reason);
         }
 
-        if((!strcmp(first->type, "_boolean_") && !strcmp(second->type, "_boolean_"))
-        || (!strcmp(first->type, "_real_") && !strcmp(second->type, "_real_"))
+        if((!strcmp(first->type, "_real_") && !strcmp(second->type, "_real_"))
         || (!strcmp(first->type, "_integer_") && !strcmp(second->type, "_integer_"))) {
             sprintf(info->type, "%s", "_boolean_");
             sprintf(info->value, "%s", first->value);
@@ -595,6 +594,8 @@ void funcdef2(ast_nodeptr node, Table table) {
 }
 
 Info call(ast_nodeptr node, Table table) {
+    int i;
+    Info info_scope;
     Table func_table;
     Info info_func_table;
     Info info = get_info_func(node->children[0]->value);
@@ -618,9 +619,26 @@ Info call(ast_nodeptr node, Table table) {
             sprintf(error_reason, "Wrong number of arguments in call to function %s (got %d, expected %d)", node->children[0]->value, node->nr_children-1, n_arguments);
             set_error(node->children[0],error_reason);
         }
-        else {
-            return func_table->info;
+
+        info_func_table = func_table->info;
+        info_func_table = info_func_table->next;
+        //printf("NEW CALL\n");
+        for(i = 1; i < n_arguments + 1; i++) {
+            //printf("node: %s\n", node->children[i]->value);
+            info_scope = terminal(node->children[i], table);
+            if(info_scope != NULL) {
+                //printf("call value: %s - %s %s - %s\n",info_func_table->value, info_func_table->type, info_scope->value, info_scope->type);
+                if(strcmp(info_func_table->type, info_scope->type)) {
+                    char error_reason[128];
+                    sprintf(error_reason, "Incompatible type for argument %d in call to function %s (got %s, expected %s)", i, node->children[0]->value, info_scope->type, info_func_table->type);
+                    set_error(node->children[i],error_reason);
+                }
+            }
+            info_func_table = info_func_table->next;
         }
+        
+        return func_table->info;
+
     } else {
         // Symbol not defined
         char error_reason[128];

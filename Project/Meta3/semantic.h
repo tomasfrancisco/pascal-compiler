@@ -14,7 +14,6 @@ void funcparams(ast_nodeptr node, Table table);
 void funcdef(ast_nodeptr node, Table table);
 void funcdef2(ast_nodeptr node, Table table);
 void ifelse(ast_nodeptr node, Table table);
-void statlist(ast_nodeptr node, Table table);
 void writeln(ast_nodeptr node, Table table);
 void valparam(ast_nodeptr node, Table table);
 Info call(ast_nodeptr node, Table table);

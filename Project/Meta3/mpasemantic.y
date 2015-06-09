@@ -34,7 +34,7 @@
 %token SEMIC COLON DOT LBRAC RBRAC COMMA
 %token <str> ID STRING REALLIT INTLIT AND
 
-%type <ptr> WhileStat IfStat AssignSym Logic Operator SignAdd Sign FuncPartAux AddOP Factor SimpleExpr Term Id Prog ProgHeading ProgBlock VarPart VarPartAux VarDeclaration IDList IDAux FuncPart FuncDeclaration FuncHeading FuncIdent FormalParamList FormalParamListAux FormalParams FuncBlock StatPart CompStat StatList StatListAux Stat WritelnPList WritelnPListAux1 WritelnPListAux2 Expr ParamList ParamListAux
+%type <ptr> WhileStat IfStat Logic Operator SignAdd Sign FuncPartAux AddOP Factor SimpleExpr Term Id Prog ProgHeading ProgBlock VarPart VarPartAux VarDeclaration IDList IDAux FuncPart FuncDeclaration FuncHeading FuncIdent FormalParamList FormalParamListAux FormalParams FuncBlock StatPart CompStat StatList StatListAux Stat WritelnPList WritelnPListAux1 WritelnPListAux2 Expr ParamList ParamListAux
 
 %right THEN
 %right ELSE
@@ -113,13 +113,12 @@ Stat                :   CompStat                                            {$$=
                                                                                         $$=createNode(line,col - ((int)strlen(yytext) - 1),"Repeat",NULL,0,2,createNode(-1,-1,"StatList","Folha",0,0),$4);
                                                                                 }else $$=createNode(line,col - ((int)strlen(yytext) - 1),"Repeat",NULL,0,2,$2,$4);}
                     |   VAL LBRAC PARAMSTR LBRAC Expr RBRAC COMMA Id RBRAC  {$$=createNode(line,col - ((int)strlen(yytext) - 1),"ValParam",NULL,0,2,$5,$8);}
-                    |   Id AssignSym Expr                                      {$$=createNode(((ast_nodeptr)$2)->line, ((ast_nodeptr)$2)->column,((ast_nodeptr)$2)->type,((ast_nodeptr)$2)->value,0,2,$1,$3);}
+                    |   Id ASSIGN Expr                                      {$$=createNode(line,col - ((int)strlen(yytext) - 1),"Assign", NULL,0,2,$1,$3);}
                     |   WRITELN WritelnPList                                {$$=createNode(line,col - ((int)strlen(yytext) - 1),"WriteLn",NULL,0,1,$2);}
                     |   WRITELN                                             {$$=createNode(line,col - ((int)strlen(yytext) - 1),"WriteLn",NULL,0,0);}
                     |   /*%empty*/                                          {$$=NULL;}
 WhileStat:              WHILE                                               {$$=createNode(line,col - ((int)strlen(yytext) - 1),"While",yytext,0,0);}
 IfStat:                 IF                                                  {$$=createNode(line,col - ((int)strlen(yytext) - 1),"IfElse",yytext,0, 0);}
-AssignSym:              ASSIGN                                              {$$=createNode(line,col - ((int)strlen(yytext) - 1),"Assign",NULL,0,0);}
 WritelnPList        :   LBRAC WritelnPListAux1 WritelnPListAux2 RBRAC       {$$=createNode(line,col - ((int)strlen(yytext) - 1),"WritelnPList",NULL,1,2,$2,$3);}
 WritelnPListAux1    :   Expr                                                {$$=createNode(line,col - ((int)strlen(yytext) - 1),"WritelnPListAux1Expr",NULL,1,1,$1);}
                     |   STRING                                              {$$=createNode(line,col - ((int)strlen(yytext) - 1),"String",$1,0,0);}
@@ -150,7 +149,7 @@ Sign:                   '-'                                                 {$$=
                     |   '+'                                                 {$$=createNode(line,col - ((int)strlen(yytext) - 1),"Plus",NULL, 0, 0);}
 
 Term:					Term Operator Factor								{$$=createNode(((ast_nodeptr)$2)->line,((ast_nodeptr)$2)->column,((ast_nodeptr)$2)->type,((ast_nodeptr)$2)->value, 0, 2, $1, $3);}
-                    |	Factor												{$$=createNode(line,col - ((int)strlen(yytext) - 1),"Factor",NULL, 1, 1, $1);}
+                    |	Factor												{$$=createNode(((ast_nodeptr)$1)->line,((ast_nodeptr)$1)->column,"Factor",NULL, 1, 1, $1);}
 
 Operator:               '/'                                                 {$$=createNode(line,col - ((int)strlen(yytext) - 1),"RealDiv",NULL, 0, 0);}             
                     |   '*'                                                 {$$=createNode(line,col - ((int)strlen(yytext) - 1),"Mul",NULL, 0, 0);}
